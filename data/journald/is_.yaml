@@ -1,0 +1,3 @@
+---
+tlog::rec_session::options:
+  writer: 'syslog'

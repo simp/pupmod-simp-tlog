@@ -1,0 +1,57 @@
+{
+  "name": "simp-tlog",
+  "version": "0.1.0",
+  "author": "simp",
+  "summary": "A module for managing Tlog",
+  "license": "Apache-2.0",
+  "source": "https://github.com/simp/pupmod-simp-tlog",
+  "project_page": "https://github.com/simp/pupmod-simp-tlog",
+  "issues_url": "https://simp-project.atlassian.net",
+  "tags": [
+    "simp",
+    "tlog",
+    "logging",
+    "security",
+    "monitoring"
+  ],
+  "dependencies": [
+    {
+      "name": "simp/simplib",
+      "version_requirement": ">= 3.10.0 < 4.0.0"
+    },
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.13.1 < 5.0.0"
+    }
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "CentOS",
+      "operatingsystemrelease": [
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "OracleLinux",
+      "operatingsystemrelease": [
+        "6",
+        "7"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 4.6.0 < 6.0.0"
+    }
+  ],
+  "data_provider": "hiera"
+}

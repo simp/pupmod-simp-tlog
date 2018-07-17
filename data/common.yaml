@@ -1,0 +1,22 @@
+---
+lookup_options:
+  tlog::rec_session::options:
+    merge:
+      strategy: deep
+      knockout_prefix: --
+  tlog::config::rsyslog::logrotate_options:
+    merge:
+      strategy: deep
+      knockout_prefix: --
+
+tlog::rec_session::options:
+  shell: '/bin/bash'
+  log:
+    # This is set to false by default so that sensitive information from the
+    # keyboard is not collected. Be aware that enabling this will collect
+    # almost everything you type.
+    input: false
+
+tlog::config::rsyslog::logrotate_options:
+  missingok: true
+  lastaction_restart_logger: true

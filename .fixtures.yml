@@ -1,0 +1,20 @@
+---
+fixtures:
+  repositories:
+    logrotate:
+      repo: https://github.com/simp/pupmod-simp-logrotate
+      ref: master
+    rsyslog:
+      repo: https://github.com/simp/pupmod-simp-rsyslog
+      ref: master
+    simplib:
+      repo: https://github.com/simp/pupmod-simp-simplib
+      ref: master
+    stdlib:
+      repo: https://github.com/simp/puppetlabs-stdlib
+      ref: master
+    systemd:
+      repo: https://github.com/simp/puppet-systemd
+      branch: simp-master
+  symlinks:
+    tlog: "#{source_dir}"
