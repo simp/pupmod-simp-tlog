@@ -14,7 +14,7 @@ stages:
 # version requirements, even if they match these defaults.
 image: 'ruby:2.1'
 variables:
-  PUPPET_VERSION: '~> 4.10.0'
+  PUPPET_VERSION: '~> 4.10.4'
   BUNDLER_VERSION: '1.16.1'
   MODULE_NAME: "$(ruby -r json -e 'JSON.load(File.read('metadata.json'))['name']')"
   MODULE_VERSION: "$(ruby -r json -e 'JSON.load(File.read('metadata.json'))['version']')"

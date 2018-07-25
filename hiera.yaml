@@ -2,7 +2,7 @@
 version: 4
 datadir: data
 hierarchy:
-  - name: "fips_enabled"
+  - name: "journald"
     backend: yaml
     path: "journald/is_%{facts.systemd}"
   - name: "common"

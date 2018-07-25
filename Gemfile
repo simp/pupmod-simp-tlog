@@ -20,6 +20,8 @@ group :test do
   gem 'simp-rake-helpers', ENV.fetch('SIMP_RAKE_HELPERS_VERSION', ['>= 5.2', '< 6.0'])
 end
 
+gem 'net-telnet', '~> 0.1.1'
+
 group :development do
   gem 'travis'
   gem 'travis-lint'
