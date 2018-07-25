@@ -16,7 +16,7 @@ describe 'tlog::rec_session' do
 
     it {
       tlog_users_var = %(TLOG_USERS="#{current_class[:shell_hook_users_file]}")
-      tlog_cmd_var = %(CMD="#{current_class[:shell_hook_cmd]}")
+      tlog_cmd_var = %(TLOG_CMD="#{current_class[:shell_hook_cmd]}")
 
       is_expected.to create_file('/etc/profile.d/tlog.sh').with(file_attrs)
       is_expected.to create_file('/etc/profile.d/tlog.sh').with_content(%r(#{tlog_users_var}))
@@ -25,7 +25,7 @@ describe 'tlog::rec_session' do
 
     it {
       tlog_users_var = %(set TLOG_USERS="#{current_class[:shell_hook_users_file]}")
-      tlog_cmd_var = %(set CMD="#{current_class[:shell_hook_cmd]}")
+      tlog_cmd_var = %(set TLOG_CMD="#{current_class[:shell_hook_cmd]}")
 
       is_expected.to create_file('/etc/profile.d/tlog.csh').with(file_attrs)
       is_expected.to create_file('/etc/profile.d/tlog.csh').with_content(%r(#{tlog_users_var}))
