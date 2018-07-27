@@ -11,7 +11,7 @@
 ## Description
 
 This module manages the installation and configuration of
-[tlog](http://scribery.github.io/tlog/) for active termainal session recording.
+[tlog](http://scribery.github.io/tlog/) for active terminal session recording.
 
 By default, the logs will be recorded to `journald` with systems running
 `systemd` and `syslog` otherwise.
