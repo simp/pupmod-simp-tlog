@@ -8,9 +8,10 @@ HOSTS:
     box:        centos/7
     hypervisor: vagrant
     yum_repos:
-      local:
-        baseurl: 'http://<%= `hostname -i`.strip %>:9999/7'
-        gpgcheck: 0
+      simp:
+        baseurl: https://packagecloud.io/simp-project/6_X_Dependencies/el/7/$basearch
+        gpgkeys:
+          - https://raw.githubusercontent.com/NationalSecurityAgency/SIMP/master/GPGKEYS/RPM-GPG-KEY-SIMP
       epel:
         mirrorlist: 'https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch'
         gpgkeys:
@@ -22,9 +23,10 @@ HOSTS:
     box:        centos/6
     hypervisor: vagrant
     yum_repos:
-      local:
-        baseurl: 'http://<%= `hostname -i`.strip %>:9999/6'
-        gpgcheck: 0
+      simp:
+        baseurl: https://packagecloud.io/simp-project/6_X_Dependencies/el/6/$basearch
+        gpgkeys:
+          - https://raw.githubusercontent.com/NationalSecurityAgency/SIMP/master/GPGKEYS/RPM-GPG-KEY-SIMP
       epel:
         mirrorlist: 'https://mirrors.fedoraproject.org/metalink?repo=epel-6&arch=$basearch'
         gpgkeys:
