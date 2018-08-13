@@ -30,8 +30,11 @@ set TLOG_CMD="<%= $app_path %>"
 if ( -f "$TLOG_USERS" ) then
   if ( ! ($?TLOG_RUNNING) ) then
 
+    set TLOG_UNAME=`id -un`
+    set TLOG_GNAME=`id -gn`
+
     set TLOG_D='$'
-    set TLOG_PATTERN="^(%$GROUP|$USER)$TLOG_D"
+    set TLOG_PATTERN="^(%$TLOG_GNAME|$TLOG_UNAME)$TLOG_D"
     set TLOG_MATCH=`grep -E "$TLOG_PATTERN" "$TLOG_USERS"`
 
     if ( "$TLOG_MATCH" != "" ) then
