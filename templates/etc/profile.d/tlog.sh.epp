@@ -45,39 +45,42 @@ tlog_parent(){
   return $retval
 }
 
-if [ -f "${TLOG_USERS}" ]; then
-  if ! `tlog_parent $PPID`; then
+TLOG_UID=`id -u`
 
-    TLOG_UID=`id -u`
-    TLOG_UNAME=`id -nu`
-    TLOG_GNAME=`id -ng`
+if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
+  if [ -f "${TLOG_USERS}" ]; then
+    if ! `tlog_parent $PPID`; then
 
-    if `grep -qE "^(%${TLOG_GNAME}|${TLOG_UNAME})$" "${TLOG_USERS}"`; then
+      TLOG_UNAME=`id -nu`
+      TLOG_GNAME=`id -ng`
 
-      # Root can always see all processes
-      if [ "${TLOG_UID}" != '0' ]; then
-        TLOG_VISIBLE_USERS=`ps --no-headers -a -o user | sort -u | wc -l`
+      if `grep -qE "^(%${TLOG_GNAME}|${TLOG_UNAME})$" "${TLOG_USERS}"`; then
 
-        # If the system is set to have 'hidepid' activated for the /proc
-        # filesystem, then this code will be unable to see the parent process
-        # IDs and will require that the native shell of the user being managed
-        # be set to tlog-rec-session.
-        if [ ! $TLOG_VISIBLE_USERS -gt 1 ]; then
-          echo "TLog Error: Can not see parent processes"
-          echo "TLog Error: This account is required to be monitored"
-          echo "TLog Error: Please ask the system administrator to set the default shell for '${TLOG_UNAME}' to '/usr/bin/tlog-rec-session'"
-          exit 1
+        # Root can always see all processes
+        if [ "${TLOG_UID}" != '0' ]; then
+          TLOG_VISIBLE_USERS=`ps --no-headers -a -o user | sort -u | wc -l`
+
+          # If the system is set to have 'hidepid' activated for the /proc
+          # filesystem, then this code will be unable to see the parent process
+          # IDs and will require that the native shell of the user being managed
+          # be set to tlog-rec-session.
+          if [ ! $TLOG_VISIBLE_USERS -gt 1 ]; then
+            echo "TLog Error: Can not see parent processes"
+            echo "TLog Error: This account is required to be monitored"
+            echo "TLog Error: Please ask the system administrator to set the default shell for '${TLOG_UNAME}' to '/usr/bin/tlog-rec-session'"
+            exit 1
+          fi
         fi
-      fi
 
-      if [[ $- == *i* ]] || `shopt -q login_shell`; then
-        TLOG_CMD="${TLOG_CMD} -l"
-      fi
+        if [[ $- == *i* ]] || `shopt -q login_shell`; then
+          TLOG_CMD="${TLOG_CMD} -l"
+        fi
 
-      if ! `ps --no-headers -o args $$ | grep -qe "-c[[:space:]]\+.\+"`; then
-        TLOG_REC_SESSION_SHELL=$SHELL
+        if ! `ps --no-headers -o args $$ | grep -qe "-c[[:space:]]\+.\+"`; then
+          TLOG_REC_SESSION_SHELL=$SHELL
 
-        exec $TLOG_CMD
+          exec $TLOG_CMD
+        fi
       fi
     fi
   fi

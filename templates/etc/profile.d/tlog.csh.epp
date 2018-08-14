@@ -27,30 +27,34 @@
 set TLOG_USERS="<%= $users_file %>"
 set TLOG_CMD="<%= $app_path %>"
 
-if ( -f "$TLOG_USERS" ) then
-  if ( ! ($?TLOG_RUNNING) ) then
+set TLOG_UID=`id -u`
 
-    set TLOG_UNAME=`id -un`
-    set TLOG_GNAME=`id -gn`
+if ( `getent passwd $TLOG_UID | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ) then
+  if ( -f "$TLOG_USERS" ) then
+    if ( ! ($?TLOG_RUNNING) ) then
 
-    set TLOG_D='$'
-    set TLOG_PATTERN="^(%$TLOG_GNAME|$TLOG_UNAME)$TLOG_D"
-    set TLOG_MATCH=`grep -E "$TLOG_PATTERN" "$TLOG_USERS"`
+      set TLOG_UNAME=`id -un`
+      set TLOG_GNAME=`id -gn`
 
-    if ( "$TLOG_MATCH" != "" ) then
-      setenv TLOG_RUNNING true
+      set TLOG_D='$'
+      set TLOG_PATTERN="^(%$TLOG_GNAME|$TLOG_UNAME)$TLOG_D"
+      set TLOG_MATCH=`grep -E "$TLOG_PATTERN" "$TLOG_USERS"`
 
-      setenv TLOG_REC_SESSION_SHELL $SHELL
+      if ( "$TLOG_MATCH" != "" ) then
+        setenv TLOG_RUNNING true
 
-      if ($?prompt || $?loginsh) then
-        set TLOG_CMD="$TLOG_CMD -l"
-      endif
+        setenv TLOG_REC_SESSION_SHELL $SHELL
 
-      set TLOG_PATTERN='-c[[:space:]]\+.\+'
-      set TLOG_PASSTHROUGH_CMD=`ps --no-headers -o args $$ | grep -oe "$TLOG_PATTERN"`
+        if ($?prompt || $?loginsh) then
+          set TLOG_CMD="$TLOG_CMD -l"
+        endif
 
-      if ( "$TLOG_PASSTHROUGH_CMD" == "" ) then
-        exec $TLOG_CMD
+        set TLOG_PATTERN='-c[[:space:]]\+.\+'
+        set TLOG_PASSTHROUGH_CMD=`ps --no-headers -o args $$ | grep -oe "$TLOG_PATTERN"`
+
+        if ( "$TLOG_PASSTHROUGH_CMD" == "" ) then
+          exec $TLOG_CMD
+        endif
       endif
     endif
   endif
