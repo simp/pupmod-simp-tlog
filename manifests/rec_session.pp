@@ -70,7 +70,7 @@ class tlog::rec_session (
     default => 'absent'
   }
 
-  file { '/etc/profile.d/tlog.sh':
+  file { '/etc/profile.d/00-simp-tlog.sh':
     ensure  => $_hook_file_ensure,
     content => epp("${module_name}/etc/profile.d/tlog.sh.epp",
       {
@@ -81,7 +81,7 @@ class tlog::rec_session (
     *       => $_file_defaults
   }
 
-  file { '/etc/profile.d/tlog.csh':
+  file { '/etc/profile.d/00-simp-tlog.csh':
     ensure  => $_hook_file_ensure,
     content => epp("${module_name}/etc/profile.d/tlog.csh.epp",
       {
@@ -101,8 +101,8 @@ class tlog::rec_session (
   Class['tlog::install'] -> File['/etc/tlog/tlog-rec-session.conf']
 
   if $shell_hook {
-    Class['tlog::install'] -> File['/etc/profile.d/tlog.sh']
-    Class['tlog::install'] -> File['/etc/profile.d/tlog.csh']
+    Class['tlog::install'] -> File['/etc/profile.d/00-simp-tlog.sh']
+    Class['tlog::install'] -> File['/etc/profile.d/00-simp-tlog.csh']
     Class['tlog::install'] -> File[$shell_hook_users_file]
   }
 }

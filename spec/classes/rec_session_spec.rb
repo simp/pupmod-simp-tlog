@@ -18,18 +18,18 @@ describe 'tlog::rec_session' do
       tlog_users_var = %(TLOG_USERS="#{current_class[:shell_hook_users_file]}")
       tlog_cmd_var = %(TLOG_CMD="#{current_class[:shell_hook_cmd]}")
 
-      is_expected.to create_file('/etc/profile.d/tlog.sh').with(file_attrs)
-      is_expected.to create_file('/etc/profile.d/tlog.sh').with_content(%r(#{tlog_users_var}))
-      is_expected.to create_file('/etc/profile.d/tlog.sh').with_content(%r(#{tlog_cmd_var}))
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.sh').with(file_attrs)
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.sh').with_content(%r(#{tlog_users_var}))
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.sh').with_content(%r(#{tlog_cmd_var}))
     }
 
     it {
       tlog_users_var = %(set TLOG_USERS="#{current_class[:shell_hook_users_file]}")
       tlog_cmd_var = %(set TLOG_CMD="#{current_class[:shell_hook_cmd]}")
 
-      is_expected.to create_file('/etc/profile.d/tlog.csh').with(file_attrs)
-      is_expected.to create_file('/etc/profile.d/tlog.csh').with_content(%r(#{tlog_users_var}))
-      is_expected.to create_file('/etc/profile.d/tlog.csh').with_content(%r(#{tlog_cmd_var}))
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.csh').with(file_attrs)
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.csh').with_content(%r(#{tlog_users_var}))
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.csh').with_content(%r(#{tlog_cmd_var}))
     }
 
     it { is_expected.to create_file('/etc/security/tlog.users').with_content("#{current_class[:shell_hook_users].join("\n")}\n") }
@@ -76,8 +76,8 @@ describe 'tlog::rec_session' do
 
           it_behaves_like 'a structured module'
 
-          it { is_expected.to create_class('tlog::install').that_comes_before('File[/etc/profile.d/tlog.sh]') }
-          it { is_expected.to create_class('tlog::install').that_comes_before('File[/etc/profile.d/tlog.csh]') }
+          it { is_expected.to create_class('tlog::install').that_comes_before('File[/etc/profile.d/00-simp-tlog.sh]') }
+          it { is_expected.to create_class('tlog::install').that_comes_before('File[/etc/profile.d/00-simp-tlog.csh]') }
           it { is_expected.to create_class('tlog::install').that_comes_before('File[/etc/security/tlog.users]') }
 
         end
