@@ -32,9 +32,8 @@ group :development do
   gem 'pry-byebug'
   gem 'pry-doc'
 
-  # `listen` is a dependency of `guard`
-  # from `listen` 3.1+, `ruby_dep` requires Ruby version >= 2.2.3, ~> 2.2
-  gem 'listen', '~> 3.0.6'
+  # byebug 9.1+ requires ruby 2.2.0+
+  gem 'byebug', '~> 9.0.0'
 end
 
 group :system_tests do
