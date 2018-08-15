@@ -48,7 +48,7 @@ variables:
     # Use cached and local resources before trying network resources
     - 'gem list -ie "${GEM_BUNDLER_VER[@]}" --silent bundler || "${GEM_INSTALL_CMD[@]}" --local "${GEM_BUNDLER_VER[@]}" bundler || "${GEM_INSTALL_CMD[@]}" "${GEM_BUNDLER_VER[@]}" bundler'
     - 'rm -rf pkg/ || :'
-    - 'bundle check || rm -f Gemfile.lock && ("${BUNDLER_INSTALL_CMD[@]}" --local || "${BUNDLER_INSTALL_CMD[@]}") || echo "PIPELNE: Bundler could not find everything"'
+    - 'bundle check || rm -f Gemfile.lock && ("${BUNDLER_INSTALL_CMD[@]}" --local || "${BUNDLER_INSTALL_CMD[@]}" || bundle pristine ||  "${BUNDLER_INSTALL_CMD[@]}") || echo "PIPELNE: Bundler could not find everything"'
 
 # Puppet + testing environment anchors
 # --------------------------------------
@@ -56,14 +56,12 @@ variables:
   image: 'ruby:2.1'
   variables:
     PUPPET_VERSION: '~> 4.10.0'
-    BEAKER_PUPPET_COLLECTION: 'pc1'
     BEAKER_PUPPET_AGENT_VERSION: '~> 1.10.2'
 
 .pup_4_latest: &pup_4_latest
   image: 'ruby:2.1'
   variables:
     PUPPET_VERSION: '~> 4.0'
-    BEAKER_PUPPET_COLLECTION: 'pc1'
     BEAKER_PUPPET_AGENT_VERSION: '~> 1.10.2'
 
 
