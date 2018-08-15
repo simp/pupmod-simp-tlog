@@ -25,7 +25,7 @@
 #
 class tlog::config::rsyslog (
   Hash                 $logrotate_options,
-  String[1]            $match_rule         = '$programname == \'tlog-rec-session\' or $programname == \'-tlog-rec-session\' $programname == \'tlog\'',
+  String[1]            $match_rule         = '$programname == \'tlog-rec-session\' or $programname == \'-tlog-rec-session\' or $programname == \'tlog\'',
   Stdlib::Absolutepath $log_file           = '/var/log/tlog.log',
   Boolean              $stop_processing    = true,
   Boolean              $logrotate          = simplib::lookup('simp_options::logrotate', { 'default_value' => false })
