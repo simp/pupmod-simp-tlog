@@ -35,9 +35,9 @@ variables:
 # Dependency anchors
 # --------------------------------------
 .setup_bundler_env: &setup_bundler_env
+  # Cache bundler gems for similar ruby versions between pipelines
   cache:
     untracked: true
-    # A broad key for caching bundler between runs
     key: "${CI_PROJECT_NAMESPACE}_ruby-${MATRIX_RUBY_VERSION}_bundler"
     paths:
       - '.vendor'
@@ -95,7 +95,6 @@ variables:
 .lint_tests: &lint_tests
   stage: 'validation'
   tags: ['docker']
-  <<: *cache_bundler
   <<: *setup_bundler_env
   script:
     - 'bundle exec rake syntax'
@@ -104,7 +103,6 @@ variables:
 .unit_tests: &unit_tests
   stage: 'validation'
   tags: ['docker']
-  <<: *cache_bundler
   <<: *setup_bundler_env
   script:
     - 'bundle exec rake spec'
@@ -112,14 +110,12 @@ variables:
 .acceptance_base: &acceptance_base
   stage: 'acceptance'
   tags: ['beaker']
-  <<: *cache_bundler
   <<: *setup_bundler_env
 
 # Basic Sanity Checks (and cache optimization)
 #=======================================================================
 sanity_checks:
   <<: *pup_4_latest
-  <<: *cache_bundler
   <<: *setup_bundler_env
   stage: 'sanity'
   tags: ['docker']
