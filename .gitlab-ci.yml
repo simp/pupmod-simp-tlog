@@ -23,29 +23,31 @@ stages:
 image: 'ruby:2.1'
 
 variables:
-  PUPPET_VERSION:    '~> 4.10.4'
+  PUPPET_VERSION:    'DEFINE IN JOB'   # Matrixed jobs must override this
   BUNDLER_VERSION:   '1.16.1'
   GEM_HOME:          .vendor/gem_install
   BUNDLE_CACHE_PATH: .vendor/bundle
   BUNDLE_PATH:       .vendor/bundle
-#  BUNDLE_NO_PRUNE:   'true'
+  BUNDLE_BIN:        .vendor/gem_install/bin
+  BUNDLE_NO_PRUNE:   'true'
 
 # Dependency anchors
 # --------------------------------------
 .cache_bundler: &cache_bundler
   cache:
     untracked: true
-    # A *very* broad key for caching bundler between runs
-    key: "${CI_PROJECT_NAMESPACE}_bundler"
+    # A broad key for caching bundler between runs
+    key: "${CI_PROJECT_NAMESPACE}_${MATRIX_RUBY_VERSION}_bundler"
     paths:
       - '.vendor'
 
+# Use cached and local resources before trying network resources
 .setup_bundler_env: &setup_bundler_env
   before_script:
+    - 'mkdir -p ${GEM_HOME} ${BUNDLER_BIN}'
     - 'declare GEM_BUNDLER_VER=(-v "~> ${BUNDLER_VERSION:-1.16.0}")'
     - 'declare GEM_INSTALL_CMD=(gem install --no-document)'
     - 'declare BUNDLER_INSTALL_CMD=(bundle install --no-binstubs --jobs $(nproc) "${FLAGS[@]}")'
-    # Use cached and local resources before trying network resources
     - 'gem list -ie "${GEM_BUNDLER_VER[@]}" --silent bundler || "${GEM_INSTALL_CMD[@]}" --local "${GEM_BUNDLER_VER[@]}" bundler || "${GEM_INSTALL_CMD[@]}" "${GEM_BUNDLER_VER[@]}" bundler'
     - 'rm -rf pkg/ || :'
     - 'bundle check || rm -f Gemfile.lock && ("${BUNDLER_INSTALL_CMD[@]}" --local || "${BUNDLER_INSTALL_CMD[@]}" || bundle pristine ||  "${BUNDLER_INSTALL_CMD[@]}") || echo "PIPELNE: Bundler could not find everything"'
@@ -57,12 +59,14 @@ variables:
   variables:
     PUPPET_VERSION: '~> 4.10.0'
     BEAKER_PUPPET_AGENT_VERSION: '~> 1.10.2'
+    MATRIX_RUBY_VERSION: '2.1'
 
 .pup_4_latest: &pup_4_latest
   image: 'ruby:2.1'
   variables:
     PUPPET_VERSION: '~> 4.0'
     BEAKER_PUPPET_AGENT_VERSION: '~> 1.10.2'
+    MATRIX_RUBY_VERSION: '2.1'
 
 
 .pup_5_3_2: &pup_5_3_2
@@ -71,6 +75,7 @@ variables:
     PUPPET_VERSION: '~> 5.3.2'
     BEAKER_PUPPET_COLLECTION: 'puppet5'
     BEAKER_PUPPET_AGENT_VERSION: '~> 5.3.2'
+    MATRIX_RUBY_VERSION: '2.4'
 
 .pup_5_5_1: &pup_5_5_1
   image: 'ruby:2.4'
@@ -78,6 +83,7 @@ variables:
     PUPPET_VERSION: '~> 5.5.1'
     BEAKER_PUPPET_COLLECTION: 'puppet5'
     BEAKER_PUPPET_AGENT_VERSION: '~> 5.5.1'
+    MATRIX_RUBY_VERSION: '2.4'
 
 .pup_5_latest: &pup_5_latest
   image: 'ruby:2.4'
@@ -85,6 +91,7 @@ variables:
     PUPPET_VERSION: '~> 5.0'
     BEAKER_PUPPET_COLLECTION: 'puppet5'
     BEAKER_PUPPET_AGENT_VERSION: '~> 5.0'
+    MATRIX_RUBY_VERSION: '2.4'
 
 # job anchors
 # --------------------------------------
@@ -114,6 +121,7 @@ variables:
 # Basic Sanity Checks (and cache optimization)
 #=======================================================================
 sanity_checks:
+  <<: *pup_4_latest
   <<: *cache_bundler
   <<: *setup_bundler_env
   stage: 'sanity'

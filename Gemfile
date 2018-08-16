@@ -27,7 +27,6 @@ group :development do
   gem 'travis-lint'
   gem 'travish'
   gem 'puppet-blacksmith'
-  gem 'guard-rake'
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-doc'
