@@ -43,7 +43,7 @@ variables:
       - '.vendor'
   # Do our best to use cached and local resources before trying network resources
   before_script:
-    - 'find .vendor | wc -l'
+    - 'test -d .vendor && find .vendor | wc -l'
     - 'gem env'
     - 'ruby '
     - 'mkdir -p ${GEM_HOME} ${BUNDLER_BIN}'
