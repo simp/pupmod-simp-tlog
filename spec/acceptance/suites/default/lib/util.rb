@@ -33,7 +33,8 @@ module TlogTestUtil
 
     begin
       Timeout::timeout(timeout) do
-        PTY.spawn("ssh -tt -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l #{user} -p #{port} #{host}") do |r, w, pid|
+        # Cihper and HMAC set for the FIPS tests
+        PTY.spawn("ssh -tt -c aes256-ctr -m hmac-sha2-256,hmac-sha1 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -l #{user} -p #{port} #{host}") do |r, w, pid|
           begin
             r.expect(/password: /i) { |msg| w.puts(password) }
 

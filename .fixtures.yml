@@ -1,6 +1,12 @@
 ---
 fixtures:
   repositories:
+    augeasproviders_core:
+      repo: https://github.com/simp/augeasproviders_core
+      ref: master
+    augeasproviders:ssh:
+      repo: https://github.com/simp/augeasproviders_ssh
+      ref: master
     logrotate:
       repo: https://github.com/simp/pupmod-simp-logrotate
       ref: master
@@ -9,6 +15,9 @@ fixtures:
       ref: master
     simplib:
       repo: https://github.com/simp/pupmod-simp-simplib
+      ref: master
+    ssh:
+      repo: https://github.com/simp/pupmod-simp-ssh
       ref: master
     stdlib:
       repo: https://github.com/simp/puppetlabs-stdlib
