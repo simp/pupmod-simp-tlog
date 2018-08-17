@@ -23,38 +23,39 @@ stages:
 image: 'ruby:2.1'
 
 variables:
-  PUPPET_VERSION:    'DEFINE IN JOB'   # Matrixed jobs MUST override this
+  PUPPET_VERSION:    'UNDEFINED' # <- Matrixed jobs MUST override this (or fail)
   BUNDLER_VERSION:   '1.16.1'
-  # Download dependencies to locations the gitlab-runner user can write to
+
+  # Force dependencies into a path the gitlab-runner user can write to.
+  # (This avoids some failures on Runners with misconfigured ruby environments.)
   GEM_HOME:          .vendor/gem_install
   BUNDLE_CACHE_PATH: .vendor/bundle
   BUNDLE_PATH:       .vendor/bundle
   BUNDLE_BIN:        .vendor/gem_install/bin
   BUNDLE_NO_PRUNE:   'true'
 
-# Dependency anchors
+
+# bundler dependencies and caching
+#
+# - Cache bundler gems between pipelines foreach Ruby version
+# - Try to use cached and local resources before downloading dependencies
 # --------------------------------------
 .setup_bundler_env: &setup_bundler_env
-  # Cache bundler gems for similar ruby versions between pipelines
   cache:
     untracked: true
     key: "${CI_PROJECT_NAMESPACE}_ruby-${MATRIX_RUBY_VERSION}_bundler"
     paths:
       - '.vendor'
-  # Do our best to use cached and local resources before trying network resources
   before_script:
-    - 'test -d .vendor && find .vendor | wc -l'
-    - 'gem env'
-    - 'ruby '
-    - 'mkdir -p ${GEM_HOME} ${BUNDLER_BIN}'
     - 'declare GEM_BUNDLER_VER=(-v "~> ${BUNDLER_VERSION:-1.16.0}")'
     - 'declare GEM_INSTALL_CMD=(gem install --no-document)'
     - 'declare BUNDLER_INSTALL_CMD=(bundle install --no-binstubs --jobs $(nproc) "${FLAGS[@]}")'
+    - 'mkdir -p ${GEM_HOME} ${BUNDLER_BIN}'
     - 'gem list -ie "${GEM_BUNDLER_VER[@]}" --silent bundler || "${GEM_INSTALL_CMD[@]}" --local "${GEM_BUNDLER_VER[@]}" bundler || "${GEM_INSTALL_CMD[@]}" "${GEM_BUNDLER_VER[@]}" bundler'
     - 'rm -rf pkg/ || :'
     - 'bundle check || rm -f Gemfile.lock && ("${BUNDLER_INSTALL_CMD[@]}" --local || "${BUNDLER_INSTALL_CMD[@]}" || bundle pristine ||  "${BUNDLER_INSTALL_CMD[@]}") || echo "PIPELNE: Bundler could not find everything"'
 
-# Puppet + testing environment anchors
+# Puppet + testing environments
 # --------------------------------------
 .pup_4_10_0: &pup_4_10_0
   image: 'ruby:2.1'
@@ -89,7 +90,7 @@ variables:
     BEAKER_PUPPET_COLLECTION: 'puppet5'
     MATRIX_RUBY_VERSION: '2.4'
 
-# job anchors
+# jobs
 # --------------------------------------
 .lint_tests: &lint_tests
   stage: 'validation'
@@ -111,8 +112,9 @@ variables:
   tags: ['beaker']
   <<: *setup_bundler_env
 
-# Basic Sanity Checks (and cache optimization)
+# Pipeline / testing matrix
 #=======================================================================
+
 sanity_checks:
   <<: *pup_4_latest
   <<: *setup_bundler_env
@@ -124,8 +126,7 @@ sanity_checks:
     - 'bundle exec rake pkg:check_version'
     - 'bundle exec rake pkg:compare_latest_tag'
 
-# Lint Tests
-#=======================================================================
+
 pup4-lint:
   <<: *pup_4_latest
   <<: *lint_tests
@@ -134,8 +135,7 @@ pup5-lint:
   <<: *pup_5_latest
   <<: *lint_tests
 
-# Unit tests
-#=======================================================================
+
 pup4.10-unit:
   <<: *pup_4_10_0
   <<: *unit_tests
@@ -153,8 +153,6 @@ pup5.latest-unit:
   <<: *unit_tests
 
 
-# Acceptance tests
-# ==============================================================================
 pup4.10-acceptance:
   <<: *pup_4_10_0
   <<: *acceptance_base
