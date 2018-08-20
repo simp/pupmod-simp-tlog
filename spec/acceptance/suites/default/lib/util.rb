@@ -47,6 +47,8 @@ module TlogTestUtil
             rescue Errno::EIO, Timeout::Error
               # This determines that no additional input is forthcoming
             end
+          rescue Errno::EIO
+            logger.error("Password prompt never received for '#{user}@#{host}:#{port}'")
           end
         end
       end

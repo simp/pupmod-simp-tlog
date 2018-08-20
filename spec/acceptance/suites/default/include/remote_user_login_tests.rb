@@ -1,11 +1,14 @@
 # These tests need to be run in a couple of different scenarios so they have
 # been pulled aside for reuse
-shared_context 'remote user logins' do |host, ssh_info|
+shared_context 'remote user logins' do |host|
   require_relative('../lib/util')
 
   include TlogTestUtil
 
   context 'user' do
+    let(:ssh_ip) { host[:ip] }
+    let(:ssh_port) { host.options[:ssh][:port] }
+
     let(:test_pass) { 'Test passw0rd @f some l3ngth' }
     let(:test_pass_hash) {
       require 'digest/sha2'
@@ -28,12 +31,12 @@ shared_context 'remote user logins' do |host, ssh_info|
     context 'root' do
       let(:test_user) { 'root' }
 
-      it 'should create the test user with a password' do
+      it 'should set the user password' do
         on(host, %(puppet resource user #{test_user} password='#{test_pass_hash}'))
       end
 
       it 'should successfully login' do
-        session_info = local_ssh(ssh_info[:host_name], ssh_info[:port], test_user, test_pass)
+        session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
         expect(session_info[:output]).to_not match(/TLog Error/)
         expect(session_info[:success]).to be true
       end
@@ -44,7 +47,7 @@ shared_context 'remote user logins' do |host, ssh_info|
       end
 
       it 'should successfully login' do
-        session_info = local_ssh(ssh_info[:host_name], ssh_info[:port], test_user, test_pass)
+        session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
         expect(session_info[:output]).to_not match(/TLog Error/)
         expect(session_info[:success]).to be true
       end
@@ -59,7 +62,7 @@ shared_context 'remote user logins' do |host, ssh_info|
         end
 
         it 'should successfully login' do
-          session_info = local_ssh(ssh_info[:host_name], ssh_info[:port], test_user, test_pass)
+          session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
           expect(session_info[:output]).to_not match(/TLog Error/)
           expect(session_info[:success]).to be true
         end
@@ -70,7 +73,7 @@ shared_context 'remote user logins' do |host, ssh_info|
         end
 
         it 'should fail to login due to tlog' do
-          session_info = local_ssh(ssh_info[:host_name], ssh_info[:port], test_user, test_pass)
+          session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
           expect(session_info[:output]).to match(/TLog Error/)
           expect(session_info[:success]).to be false
         end
@@ -80,7 +83,7 @@ shared_context 'remote user logins' do |host, ssh_info|
         end
 
         it 'should successfully login' do
-          session_info = local_ssh(ssh_info[:host_name], ssh_info[:port], test_user, test_pass)
+          session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
           expect(session_info[:output]).to_not match(/TLog Error/)
           expect(session_info[:success]).to be true
         end
@@ -93,7 +96,7 @@ shared_context 'remote user logins' do |host, ssh_info|
         end
 
         it 'should successfully login' do
-          session_info = local_ssh(ssh_info[:host_name], ssh_info[:port], test_user, test_pass)
+          session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
           expect(session_info[:output]).to_not match(/TLog Error/)
           expect(session_info[:success]).to be true
         end

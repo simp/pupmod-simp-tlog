@@ -21,8 +21,6 @@ describe 'tlog::rec_session' do
   }
 
   hosts.each do |host|
-    ssh_info = host.connection.instance_variable_get('@ssh').options
-
     context "on #{host}" do
       context 'default parameters' do
         # Using puppet_apply as a helper
@@ -79,7 +77,7 @@ end
 
       require_relative('include/remote_user_login_tests')
 
-      include_context 'remote user logins', host, ssh_info
+      include_context 'remote user logins', host
     end
   end
 end
