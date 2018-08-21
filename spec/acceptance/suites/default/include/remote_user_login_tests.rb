@@ -27,6 +27,12 @@ shared_context 'remote user logins' do |host|
        ]
     }}
 
+    let(:hieradata_group) {{
+       'tlog::rec_session::shell_hook_users' => [
+         "%#{test_user}"
+       ]
+    }}
+
     # Make sure we didn't break root!
     context 'root' do
       let(:test_user) { 'root' }
@@ -86,6 +92,23 @@ shared_context 'remote user logins' do |host|
           session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
           expect(session_info[:output]).to_not match(/TLog Error/)
           expect(session_info[:success]).to be true
+        end
+
+        context 'when restricting by group' do
+          it 'should run puppet' do
+            set_hieradata_on(host, hieradata_group)
+            apply_manifest_on(host, manifest, :catch_failures => true)
+          end
+
+          it 'should change the user shell to /bin/bash' do
+            on(host, %(puppet resource user #{test_user} shell='/bin/bash'))
+          end
+
+          it 'should fail to login due to tlog' do
+            session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+            expect(session_info[:output]).to match(/TLog Error/)
+            expect(session_info[:success]).to be false
+          end
         end
       end
 
