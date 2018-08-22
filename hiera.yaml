@@ -1,0 +1,9 @@
+---
+version: 4
+datadir: data
+hierarchy:
+  - name: "journald"
+    backend: yaml
+    path: "journald/is_%{facts.systemd}"
+  - name: "common"
+    backend: yaml

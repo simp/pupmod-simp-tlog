@@ -1,0 +1,87 @@
+<%- |
+  Stdlib::Absolutepath $users_file = '/etc/security/tlog.users',
+  Stdlib::Absolutepath $app_path   = '/usr/bin/tlog-rec-session'
+| -%>
+# Place this script in /etc/profile.d to automatically hook any login or
+# interactive shell into tlog for a user or group listed in
+# /etc/security/tlog.users
+#
+# Entries in tlog.users should be listed one per line where users are bare
+# words such as `root` and groups are prefixed with a percent sign such as
+# `%root`.
+#
+# Copyright 2018 Trevor Vaughan <tvaughan@onyxpoint.com> - Onyx Point, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+TLOG_USERS="<%= $users_file %>"
+TLOG_CMD="<%= $app_path %>"
+
+tlog_parent(){
+  retval=1
+
+  ppid=`ps --no-headers -o ppid $1`
+
+  if [ -n "$ppid" ] && [ $ppid -gt 1 ]; then
+    if `ps --no-headers -o ppid,args $1 | grep -q 'tlog-rec-session'`; then
+      return 0
+    else
+      tlog_parent $ppid
+      retval=$?
+    fi
+
+  fi
+
+  return $retval
+}
+
+TLOG_UID=`id -u`
+
+if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
+  if [ -f "${TLOG_USERS}" ]; then
+    if ! `tlog_parent $PPID`; then
+
+      TLOG_UNAME=`id -nu`
+      TLOG_GNAME=`id -ng`
+
+      if `grep -qE "^(%${TLOG_GNAME}|${TLOG_UNAME})$" "${TLOG_USERS}"`; then
+
+        # Root can always see all processes
+        if [ "${TLOG_UID}" != '0' ]; then
+          TLOG_VISIBLE_USERS=`ps --no-headers -e -o user | sort -u | wc -l`
+
+          # If the system is set to have 'hidepid' activated for the /proc
+          # filesystem, then this code will be unable to see the parent process
+          # IDs and will require that the native shell of the user being managed
+          # be set to tlog-rec-session.
+          if [ ! $TLOG_VISIBLE_USERS -gt 1 ]; then
+            echo "TLog Error: Can not see parent processes"
+            echo "TLog Error: This account is required to be monitored"
+            echo "TLog Error: Please ask the system administrator to set the default shell for '${TLOG_UNAME}' to '/usr/bin/tlog-rec-session'"
+            exit 1
+          fi
+        fi
+
+        if [[ $- == *i* ]] || `shopt -q login_shell`; then
+          TLOG_CMD="${TLOG_CMD} -l"
+        fi
+
+        if ! `ps --no-headers -o args $$ | grep -qe "-c[[:space:]]\+.\+"`; then
+          TLOG_REC_SESSION_SHELL=$SHELL
+
+          exec $TLOG_CMD
+        fi
+      fi
+    fi
+  fi
+fi
