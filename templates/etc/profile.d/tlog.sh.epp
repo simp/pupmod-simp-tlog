@@ -58,7 +58,7 @@ if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" 
 
         # Root can always see all processes
         if [ "${TLOG_UID}" != '0' ]; then
-          TLOG_VISIBLE_USERS=`ps --no-headers -a -o user | sort -u | wc -l`
+          TLOG_VISIBLE_USERS=`ps --no-headers -e -o user | sort -u | wc -l`
 
           # If the system is set to have 'hidepid' activated for the /proc
           # filesystem, then this code will be unable to see the parent process

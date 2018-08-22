@@ -6,6 +6,18 @@ shared_context 'remote user logins' do |host|
   include TlogTestUtil
 
   context 'user' do
+    let(:hidepid) {
+      _hidepid = false
+
+      if on(host, 'findmnt -n /proc').output.strip =~ /hidepid=(\d+)/
+        if $1 != '0'
+          _hidepid = true
+        end
+      end
+
+      _hidepid
+    }
+
     let(:ssh_ip) { host[:ip] }
     let(:ssh_port) { host.options[:ssh][:port] }
 
@@ -78,14 +90,22 @@ shared_context 'remote user logins' do |host|
           apply_manifest_on(host, manifest, :catch_failures => true)
         end
 
-        it 'should fail to login due to tlog' do
-          session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-          expect(session_info[:output]).to match(/TLog Error/)
-          expect(session_info[:success]).to be false
+        it 'should fail to login due to tlog and hidepid' do
+          unless hidepid
+            skip('hidepid not set')
+          else
+            session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+            expect(session_info[:output]).to match(/TLog Error/)
+            expect(session_info[:success]).to be false
+          end
         end
 
         it 'should change the user shell to /usr/bin/tlog-rec-session' do
-          on(host, %(puppet resource user #{test_user} shell='/usr/bin/tlog-rec-session'))
+          unless hidepid
+            skip('hidepid not set')
+          else
+            on(host, %(puppet resource user #{test_user} shell='/usr/bin/tlog-rec-session'))
+          end
         end
 
         it 'should successfully login' do
@@ -104,10 +124,16 @@ shared_context 'remote user logins' do |host|
             on(host, %(puppet resource user #{test_user} shell='/bin/bash'))
           end
 
-          it 'should fail to login due to tlog' do
-            session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-            expect(session_info[:output]).to match(/TLog Error/)
-            expect(session_info[:success]).to be false
+          it 'should attempt to login' do
+            if hidepid
+              session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+              expect(session_info[:output]).to match(/TLog Error/)
+              expect(session_info[:success]).to be false
+            else
+              session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+              expect(session_info[:output]).to_not match(/TLog Error/)
+              expect(session_info[:success]).to be true
+            end
           end
         end
       end
