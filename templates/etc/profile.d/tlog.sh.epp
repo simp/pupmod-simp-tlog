@@ -52,9 +52,11 @@ if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" 
     if ! `tlog_parent $PPID`; then
 
       TLOG_UNAME=`id -nu`
-      TLOG_GNAME=`id -ng`
 
-      if `grep -qE "^(%${TLOG_GNAME}|${TLOG_UNAME})$" "${TLOG_USERS}"`; then
+      # Formatted for the grep below
+      TLOG_GROUPS=`id -nG | sed 's/ /|%/g'`
+
+      if `grep -qE "^(%${TLOG_GROUPS}|${TLOG_UNAME})$" "${TLOG_USERS}"`; then
 
         # Root can always see all processes
         if [ "${TLOG_UID}" != '0' ]; then

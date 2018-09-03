@@ -115,25 +115,48 @@ shared_context 'remote user logins' do |host|
         end
 
         context 'when restricting by group' do
-          it 'should run puppet' do
-            set_hieradata_on(host, hieradata_group)
-            apply_manifest_on(host, manifest, :catch_failures => true)
-          end
-
-          it 'should change the user shell to /bin/bash' do
-            on(host, %(puppet resource user #{test_user} shell='/bin/bash'))
-          end
-
-          it 'should attempt to login' do
-            if hidepid
-              session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-              expect(session_info[:output]).to match(/TLog Error/)
-              expect(session_info[:success]).to be false
-            else
-              session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-              expect(session_info[:output]).to_not match(/TLog Error/)
-              expect(session_info[:success]).to be true
+          shared_examples_for 'a group test' do
+            it 'should run puppet' do
+              set_hieradata_on(host, hieradata_group)
+              apply_manifest_on(host, manifest, :catch_failures => true)
             end
+
+            it 'should change the user shell to /bin/bash' do
+              on(host, %(puppet resource user #{test_user} shell='/bin/bash'))
+            end
+
+            it 'should attempt to login' do
+              if hidepid
+                session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+                expect(session_info[:output]).to match(/TLog Error/)
+                expect(session_info[:success]).to be false
+              else
+                session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+                expect(session_info[:output]).to_not match(/TLog Error/)
+                expect(session_info[:success]).to be true
+              end
+            end
+          end
+
+          context 'primary group' do
+            it_behaves_like 'a group test'
+          end
+
+          context 'secondary group' do
+            let(:secondary_group) { 'other_test_group' }
+
+            let(:hieradata_group) {{
+               'tlog::rec_session::shell_hook_users' => [
+                 "%#{secondary_group}"
+               ]
+            }}
+
+            it 'should add a secondary group to the test user' do
+              on(host, %{puppet resource group #{secondary_group} ensure=present})
+              on(host, %{puppet resource user #{test_user} groups='#{secondary_group}'})
+            end
+
+            it_behaves_like 'a group test'
           end
         end
       end
