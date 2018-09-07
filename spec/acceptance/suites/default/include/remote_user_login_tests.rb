@@ -131,7 +131,7 @@ shared_context 'remote user logins' do |host|
               end
 
               it 'should attempt to login' do
-                if hidepid
+                if (shell == 'bash') && hidepid
                   session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
                   expect(session_info[:output]).to match(/TLog Error/)
                   expect(session_info[:success]).to be false
