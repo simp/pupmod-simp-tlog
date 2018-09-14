@@ -28,11 +28,14 @@ If you find any issues, they may be submitted to our
 
 You can simply include the `tlog` class to have the software installed.
 
-To enable automatic session recording, include the `tlog::rec_session` class
-and add the users and/or groups that you want to monitor to the
-`tlog::rec_session::shell_hook_users` Array. Note: Groups should be prefixed
-with a percent sign (`%`) and it currently only works with the users primary
-group.
+To enable automatic session recording, include the `tlog::rec_session` class.
+You **MUST** then add all users and/or groups that you want to monitor to the
+`tlog::rec_session::shell_hook_users` Array. Any user that is not added to the
+monitor list will be unable to login to the system if monitoring is being
+enforced.
+
+Note: Groups should be prefixed with a percent sign (`%`) and it currently only
+works with the users primary group.
 
 When this is enabled, it will automatically hook into login and interactive
 shells based on scripts placed into `/etc/profile.d`.
