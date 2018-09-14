@@ -74,80 +74,96 @@ shared_context 'remote user logins' do |host|
     context 'test_user' do
       let(:test_user) { 'test_user' }
 
-      context 'with bash as the shell' do
-        it 'should create the test user with a password' do
-          on(host, %(puppet resource user #{test_user} password='#{test_pass_hash}' managehome=true shell='/bin/bash'))
-        end
+      ['bash', 'tcsh'].each do |shell|
 
-        it 'should successfully login' do
-          session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-          expect(session_info[:output]).to_not match(/TLog Error/)
-          expect(session_info[:success]).to be true
-        end
+        context "with #{shell} as the shell" do
+          it 'should create the test user with a password' do
+            on(host, %(puppet resource user #{test_user} password='#{test_pass_hash}' managehome=true shell='/bin/#{shell}'))
+          end
 
-        it 'should run puppet' do
-          set_hieradata_on(host, hieradata)
-          apply_manifest_on(host, manifest, :catch_failures => true)
-        end
-
-        it 'should fail to login due to tlog and hidepid' do
-          unless hidepid
-            skip('hidepid not set')
-          else
+          it 'should successfully login' do
             session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-            expect(session_info[:output]).to match(/TLog Error/)
-            expect(session_info[:success]).to be false
+            expect(session_info[:output]).to_not match(/TLog Error/)
+            expect(session_info[:success]).to be true
           end
-        end
 
-        it 'should change the user shell to /usr/bin/tlog-rec-session' do
-          unless hidepid
-            skip('hidepid not set')
-          else
-            on(host, %(puppet resource user #{test_user} shell='/usr/bin/tlog-rec-session'))
-          end
-        end
-
-        it 'should successfully login' do
-          session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-          expect(session_info[:output]).to_not match(/TLog Error/)
-          expect(session_info[:success]).to be true
-        end
-
-        context 'when restricting by group' do
           it 'should run puppet' do
-            set_hieradata_on(host, hieradata_group)
+            set_hieradata_on(host, hieradata)
             apply_manifest_on(host, manifest, :catch_failures => true)
           end
 
-          it 'should change the user shell to /bin/bash' do
-            on(host, %(puppet resource user #{test_user} shell='/bin/bash'))
-          end
+          # The csh wrapper has much looser constraints overall due to the nature of the shell
+          if shell == 'bash'
+            it 'should fail to login due to tlog and hidepid' do
+              unless hidepid
+                skip('hidepid not set')
+              else
+                session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+                expect(session_info[:output]).to match(/TLog Error/)
+                expect(session_info[:success]).to be false
+              end
+            end
 
-          it 'should attempt to login' do
-            if hidepid
-              session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-              expect(session_info[:output]).to match(/TLog Error/)
-              expect(session_info[:success]).to be false
-            else
-              session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-              expect(session_info[:output]).to_not match(/TLog Error/)
-              expect(session_info[:success]).to be true
+            it 'should change the user shell to /usr/bin/tlog-rec-session' do
+              unless hidepid
+                skip('hidepid not set')
+              else
+                on(host, %(puppet resource user #{test_user} shell='/usr/bin/tlog-rec-session'))
+              end
             end
           end
-        end
-      end
 
-      # The csh wrapper has much looser constraints overall due to the nature of the shell
-      context 'with tcsh as the shell' do
-        it 'should set the shell to /bin/tcsh' do
-          on(host, %(puppet resource user #{test_user} shell='/bin/tcsh'))
-        end
+          it 'should successfully login' do
+            session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+            expect(session_info[:output]).to_not match(/TLog Error/)
+            expect(session_info[:success]).to be true
+          end
 
-        it 'should successfully login' do
-          session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-          expect(session_info[:output]).to_not match(/TLog Error/)
-          expect(session_info[:success]).to be true
+          context 'when restricting by group' do
+            shared_examples_for 'a group test' do
+              it 'should run puppet' do
+                set_hieradata_on(host, hieradata_group)
+                apply_manifest_on(host, manifest, :catch_failures => true)
+              end
+
+              it "should change the user shell to /bin/#{shell}" do
+                on(host, %(puppet resource user #{test_user} shell='/bin/#{shell}'))
+              end
+
+              it 'should attempt to login' do
+                if (shell == 'bash') && hidepid
+                  session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+                  expect(session_info[:output]).to match(/TLog Error/)
+                  expect(session_info[:success]).to be false
+                else
+                  session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+                  expect(session_info[:output]).to_not match(/TLog Error/)
+                  expect(session_info[:success]).to be true
+                end
+              end
+            end
+
+            context 'primary group' do
+              it_behaves_like 'a group test'
+            end
+
+            context 'secondary group' do
+              let(:secondary_group) { 'other_test_group' }
+
+              let(:hieradata_group) {{
+                 'tlog::rec_session::shell_hook_users' => [
+                   "%#{secondary_group}"
+                 ]
+              }}
+
+              it 'should add a secondary group to the test user' do
+                on(host, %{puppet resource group #{secondary_group} ensure=present})
+                on(host, %{puppet resource user #{test_user} groups='#{secondary_group}'})
+              end
+
+              it_behaves_like 'a group test'
+            end
+          end
         end
       end
     end
