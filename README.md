@@ -30,9 +30,7 @@ You can simply include the `tlog` class to have the software installed.
 
 To enable automatic session recording, include the `tlog::rec_session` class.
 You **MUST** then add all users and/or groups that you want to monitor to the
-`tlog::rec_session::shell_hook_users` Array. Any user that is not added to the
-monitor list will be unable to login to the system if monitoring is being
-enforced.
+`tlog::rec_session::shell_hook_users` Array.
 
 Note: Groups should be prefixed with a percent sign (`%`) and it currently only
 works with the users primary group.
@@ -59,6 +57,17 @@ hooks have been provided for the 90% case.
 The `tlog` project is still evolving so there may be breaking changes that
 occur in the future. We highly encourage all users to file feature requests and
 bug reports with the [upstream project](https://github.com/Scribery/tlog).
+
+### hidepid
+
+If your system has the `hidepid` option on `/proc` set to anything besides `0`,
+then the shell hooks will be unable to determine if they are already running in
+a `tlog` session. In this case, you **MUST** change the user's shell to
+`/usr/bin/tlog-rec-session`. This limitation does **not** apply to the `root`
+user.
+
+NOTE: `hidepid` is set to `2` by default on [SIMP](https://simp-project.com)
+systems.
 
 ## Development
 
