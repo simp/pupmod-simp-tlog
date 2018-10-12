@@ -14,18 +14,18 @@ describe 'tlog::rec_session' do
     'tlog::config::rsyslog::logrotate' => true
   }}
 
-  let(:enforcing_hieradata) {
+  let(:not_root_enforcing_hieradata) {
    hieradata.merge({
-     'tlog::rec_session::shell_hook_users' => [ 'root' ]
+     'tlog::rec_session::shell_hook_users' => [ ]
    })
   }
 
   hosts.each do |host|
     context "on #{host}" do
-      context 'default parameters' do
+      context 'when not enforcing for "root"' do
         # Using puppet_apply as a helper
         it 'should work with no errors' do
-          set_hieradata_on(host, hieradata)
+          set_hieradata_on(host, not_root_enforcing_hieradata)
           apply_manifest_on(host, manifest, :catch_failures => true)
         end
 
@@ -39,10 +39,10 @@ describe 'tlog::rec_session' do
         end
       end
 
-      context 'when enforcing for "root"' do
+      context 'when default parameters (enforcing for "root")' do
         # Using puppet_apply as a helper
         it 'should work with no errors' do
-          set_hieradata_on(host, enforcing_hieradata)
+          set_hieradata_on(host, hieradata)
           apply_manifest_on(host, manifest, :catch_failures => true)
         end
 

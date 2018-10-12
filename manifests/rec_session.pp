@@ -1,6 +1,6 @@
 # Configure `tlog-rec-session`
 #
-# This is pulled out from the main `tlog` class becuase of the rapidly moving
+# This is pulled out from the main `tlog` class because of the rapidly moving
 # nature of the project. Having this decoupled will allow us to refactor as
 # necessary as the software progresses.
 #
@@ -45,7 +45,7 @@ class tlog::rec_session (
   Tlog::RecSessionConf $options,
   Hash                 $custom_options        = {},
   Boolean              $shell_hook            = true,
-  Array[String[1]]     $shell_hook_users      = [],
+  Array[String[1]]     $shell_hook_users      = [ 'root' ],
   Stdlib::Absolutepath $shell_hook_users_file = '/etc/security/tlog.users',
   Stdlib::Absolutepath $shell_hook_cmd        = '/usr/bin/tlog-rec-session'
 ) {

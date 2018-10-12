@@ -15,6 +15,7 @@ describe 'tlog' do
     # We'll be logging in directly in subsequent tests
     'ssh::server::conf::permitrootlogin'        => true,
     'ssh::server::conf::passwordauthentication' => true,
+    'ssh::server::conf::authorizedkeysfile'     => '.ssh/authorized_keys',
     'tlog::manage_rsyslog'                      => true,
     'tlog::config::rsyslog::logrotate'          => true
   }}
