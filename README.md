@@ -32,8 +32,7 @@ To enable automatic session recording, include the `tlog::rec_session` class.
 You **MUST** then add all users and/or groups that you want to monitor to the
 `tlog::rec_session::shell_hook_users` Array.
 
-Note: Groups should be prefixed with a percent sign (`%`) and it currently only
-works with the users primary group.
+Note: Groups should be prefixed with a percent sign (`%`).
 
 When this is enabled, it will automatically hook into login and interactive
 shells based on scripts placed into `/etc/profile.d`.
@@ -68,6 +67,22 @@ user.
 
 NOTE: `hidepid` is set to `2` by default on [SIMP](https://simp-project.com)
 systems.
+
+### tlog-play from file
+
+To playback tlog from a file, the file must only contain json entries from a
+single session. The default SIMP implementation of tlog records all sessions
+with some additional non-json formatted information in a file, causing playback
+of the raw log file to fail. To generate a usable tlog file for playback, grep
+and awk can be utilized to filter and format entries for a tlog session.
+Identify the file containing the raw tlog data. Performing a grep for
+tlog-rec-session in the logs directory can help locate log files. After
+identifying the raw log file, examine the contents of the file to identify the
+rec, a host-unique recording id, for the session to be replayed. The rec can
+then be used with grep to generate a new file containing only logs from that
+session in json format:
+
+`grep <rec> <raw log file> | awk -F"tlog-rec-session: " '{print $2}' > /tmp/tlog_for_playback`
 
 ## Development
 
