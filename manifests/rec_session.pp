@@ -4,7 +4,7 @@
 # nature of the project. Having this decoupled will allow us to refactor as
 # necessary as the software progresses.
 #
-# @api private
+# @api public
 #
 # @param options
 #   Configuration options for tlog-rec-session
