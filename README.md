@@ -57,6 +57,25 @@ The `tlog` project is still evolving so there may be breaking changes that
 occur in the future. We highly encourage all users to file feature requests and
 bug reports with the [upstream project](https://github.com/Scribery/tlog).
 
+### TLOG Hangs
+
+If a user is logged into a system using a graphical display and attempts to
+`su` to `root` from more than one terminal window in the same session, the
+second `su` will hang.
+
+This occurs because the session id is the same for both shells. When the
+`tlog-rec-session` is started the second time it sees a `tlog-rec-session` with
+the same session id and it replaces itself with a `bash` shell which then
+attempts to start a recording session and enters an endless loop.  If the user
+enters `CTRL-C`, the `root` session will still be recorded and the looping
+process will be interuppted.
+
+The above error does **not** affect `ssh` logins.  If a user requires more than
+one `root` shell they should `ssh` into the local system and `su` from that
+terminal.
+
+This bug is tracked as [SIMP-5426](https://simp-project.atlassian.net/browse/SIMP-5426)
+
 ### hidepid
 
 If your system has the `hidepid` option on `/proc` set to anything besides `0`,
