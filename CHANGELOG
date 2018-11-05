@@ -1,3 +1,6 @@
+* Mon Nov 05 2018 Liz Nemsick <lnemsick-simp@gmail.com> - 0.1.0
+- Update to Hiera 5
+
 * Mon Oct 15 2018 Jeanne Greulich <jeanne.greulich@onyxpoint.com> - 0.1.0
 - Documented known limitation and work around README for TLOG hanging
   on second window issue.
