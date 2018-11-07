@@ -1,3 +1,10 @@
+<%
+  if ENV['BEAKER_HYPERVISOR']
+    hypervisor = ENV['BEAKER_HYPERVISOR']
+  else
+    hypervisor = 'vagrant'
+  end
+-%>
 HOSTS:
   el7:
     roles:
@@ -6,7 +13,7 @@ HOSTS:
       - client
     platform:   el-7-x86_64
     box:        centos/7
-    hypervisor: vagrant
+    hypervisor: <%= hypervisor %>
     yum_repos:
       simp:
         baseurl: https://packagecloud.io/simp-project/6_X_Dependencies/el/7/$basearch
@@ -21,7 +28,7 @@ HOSTS:
       - client
     platform:   el-6-x86_64
     box:        centos/6
-    hypervisor: vagrant
+    hypervisor: <%= hypervisor %>
     yum_repos:
       simp:
         baseurl: https://packagecloud.io/simp-project/6_X_Dependencies/el/6/$basearch
@@ -36,3 +43,6 @@ CONFIG:
   log_level: verbose
   type: aio
   vagrant_memsize: 256
+<% if ENV['BEAKER_PUPPET_COLLECTION'] -%>
+  puppet_collection: <%= ENV['BEAKER_PUPPET_COLLECTION'] %>
+<% end -%>
