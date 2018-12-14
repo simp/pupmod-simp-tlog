@@ -30,16 +30,23 @@ TLOG_CMD="<%= $app_path %>"
 tlog_parent(){
   retval=1
 
-  ppid=`ps --no-headers -o ppid $1`
+  # Track all parent IDs that we've checked to prevent looping
+  if [ -z $2 ]; then
+    found_ppids=()
+  else
+    found_ppids=$2
+  fi
+
+  found_ppids+=$1
+  ppid=`ps --no-headers -o ppid $1 | sort -rn | head -1 | tr -d '[:space:']`
 
   if [ -n "$ppid" ] && [ $ppid -gt 1 ]; then
     if `ps --no-headers -o ppid,args $1 | grep -q 'tlog-rec-session'`; then
       return 0
-    else
-      tlog_parent $ppid
+    elif [[ ! " ${found_ppids[@]} " =~ " ${ppid} " ]]; then
+      tlog_parent $ppid "${found_ppids[@]}"
       retval=$?
     fi
-
   fi
 
   return $retval
@@ -49,7 +56,7 @@ TLOG_UID=`id -u`
 
 if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
   if [ -f "${TLOG_USERS}" ]; then
-    if ! `tlog_parent $PPID`; then
+    if ! tlog_parent $PPID; then
 
       TLOG_UNAME=`id -nu`
 
