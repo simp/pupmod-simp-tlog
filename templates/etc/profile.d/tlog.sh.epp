@@ -29,16 +29,22 @@ TLOG_CMD="<%= $app_path %>"
 
 TLOG_UID=`id -u`
 
-if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
-  if [ -f "${TLOG_USERS}" ]; then
-    if [ $TLOG_RUNNING -ne 0 ]; then
+if [ "${TLOG_RUNNING}" == "0" ]; then
+  export TLOG_RUNNING=0
+else
+  export TLOG_RUNNING=1
+fi
+
+if [ ! "${TLOG_RUNNING}" == "0" ]; then
+  if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
+    if [ -f "${TLOG_USERS}" ]; then
       TLOG_UNAME=`id -nu`
 
       # Formatted for the grep below
       TLOG_GROUPS=`id -nG | sed 's/ /|%/g'`
 
       if `grep -qE "^(%${TLOG_GROUPS}|${TLOG_UNAME})$" "${TLOG_USERS}"`; then
-        TLOG_RUNNING=0
+        export TLOG_RUNNING=0
 
         if [[ $- == *i* ]] || `shopt -q login_shell`; then
           TLOG_CMD="${TLOG_CMD} -l"
