@@ -43,16 +43,21 @@ if [ ! "${TLOG_RUNNING}" == "0" ]; then
       # Formatted for the grep below
       TLOG_GROUPS=`id -nG | sed 's/ /|%/g'`
 
-      if `grep -qE "^(%${TLOG_GROUPS}|${TLOG_UNAME})$" "${TLOG_USERS}"`; then
+      if grep -qE "^(%${TLOG_GROUPS}|${TLOG_UNAME})$" "${TLOG_USERS}"; then
         export TLOG_RUNNING=0
 
-        if [[ $- == *i* ]] || `shopt -q login_shell`; then
+        if [[ $- == *i* ]] || shopt -q login_shell; then
           TLOG_CMD="${TLOG_CMD} -l"
         fi
 
-        if ! `ps --no-headers -o args $$ | grep -qe "-c[[:space:]]\+.\+"`; then
+        if ! ps --no-headers -o args $$ | grep -qe "-c[[:space:]]\+.\+"; then
           TLOG_REC_SESSION_SHELL=$SHELL
 
+          # NOTE: Currently there is a bug that affects this that means that
+          # multiple tlog sessions spawned under the same parent process (think
+          # gnome-terminal or tmux/screen windows) will no longer log commands.
+          #
+          # https://github.com/Scribery/tlog/issues/228
           exec $TLOG_CMD
         fi
       fi
