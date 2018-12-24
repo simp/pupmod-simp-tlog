@@ -27,60 +27,39 @@
 TLOG_USERS="<%= $users_file %>"
 TLOG_CMD="<%= $app_path %>"
 
-tlog_parent(){
-  retval=1
-
-  ppid=`ps --no-headers -o ppid $1`
-
-  if [ -n "$ppid" ] && [ $ppid -gt 1 ]; then
-    if `ps --no-headers -o ppid,args $1 | grep -q 'tlog-rec-session'`; then
-      return 0
-    else
-      tlog_parent $ppid
-      retval=$?
-    fi
-
-  fi
-
-  return $retval
-}
-
 TLOG_UID=`id -u`
 
-if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
-  if [ -f "${TLOG_USERS}" ]; then
-    if ! `tlog_parent $PPID`; then
+if [ "${TLOG_RUNNING}" == "0" ]; then
+  export TLOG_RUNNING=0
+else
+  export TLOG_RUNNING=1
+fi
 
+# We must have an active TTY until https://github.com/Scribery/tlog/issues/227
+# is resolved
+if [ -t 1 ] && [ ! "${TLOG_RUNNING}" == "0" ]; then
+  if [ -f "${TLOG_USERS}" ]; then
+    if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
       TLOG_UNAME=`id -nu`
 
       # Formatted for the grep below
       TLOG_GROUPS=`id -nG | sed 's/ /|%/g'`
 
-      if `grep -qE "^(%${TLOG_GROUPS}|${TLOG_UNAME})$" "${TLOG_USERS}"`; then
+      if grep -qE "^(%${TLOG_GROUPS}|${TLOG_UNAME})$" "${TLOG_USERS}"; then
+        export TLOG_RUNNING=0
 
-        # Root can always see all processes
-        if [ "${TLOG_UID}" != '0' ]; then
-          TLOG_VISIBLE_USERS=`ps --no-headers -e -o user | sort -u | wc -l`
-
-          # If the system is set to have 'hidepid' activated for the /proc
-          # filesystem, then this code will be unable to see the parent process
-          # IDs and will require that the native shell of the user being managed
-          # be set to tlog-rec-session.
-          if [ ! $TLOG_VISIBLE_USERS -gt 1 ]; then
-            echo "TLog Error: Can not see parent processes"
-            echo "TLog Error: This account is required to be monitored"
-            echo "TLog Error: Please ask the system administrator to set the default shell for '${TLOG_UNAME}' to '/usr/bin/tlog-rec-session'"
-            exit 1
-          fi
-        fi
-
-        if [[ $- == *i* ]] || `shopt -q login_shell`; then
+        if [[ $- == *i* ]] || shopt -q login_shell; then
           TLOG_CMD="${TLOG_CMD} -l"
         fi
 
-        if ! `ps --no-headers -o args $$ | grep -qe "-c[[:space:]]\+.\+"`; then
+        if ! ps --no-headers -o args $$ | grep -qe "-c[[:space:]]\+.\+"; then
           TLOG_REC_SESSION_SHELL=$SHELL
 
+          # NOTE: Currently there is a bug that affects this that means that
+          # multiple tlog sessions spawned under the same parent process (think
+          # gnome-terminal or tmux/screen windows) will no longer log commands.
+          #
+          # https://github.com/Scribery/tlog/issues/228
           exec $TLOG_CMD
         fi
       fi
