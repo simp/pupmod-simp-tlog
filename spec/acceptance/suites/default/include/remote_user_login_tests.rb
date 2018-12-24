@@ -94,22 +94,8 @@ shared_context 'remote user logins' do |host|
 
           # The csh wrapper has much looser constraints overall due to the nature of the shell
           if shell == 'bash'
-            it 'should fail to login due to tlog and hidepid' do
-              unless hidepid
-                skip('hidepid not set')
-              else
-                session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-                expect(session_info[:output]).to match(/TLog Error/)
-                expect(session_info[:success]).to be false
-              end
-            end
-
             it 'should change the user shell to /usr/bin/tlog-rec-session' do
-              unless hidepid
-                skip('hidepid not set')
-              else
-                on(host, %(puppet resource user #{test_user} shell='/usr/bin/tlog-rec-session'))
-              end
+              on(host, %(puppet resource user #{test_user} shell='/usr/bin/tlog-rec-session'))
             end
           end
 
@@ -131,15 +117,9 @@ shared_context 'remote user logins' do |host|
               end
 
               it 'should attempt to login' do
-                if (shell == 'bash') && hidepid
-                  session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-                  expect(session_info[:output]).to match(/TLog Error/)
-                  expect(session_info[:success]).to be false
-                else
-                  session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-                  expect(session_info[:output]).to_not match(/TLog Error/)
-                  expect(session_info[:success]).to be true
-                end
+                session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
+                expect(session_info[:output]).to_not match(/TLog Error/)
+                expect(session_info[:success]).to be true
               end
             end
 

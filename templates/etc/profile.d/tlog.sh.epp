@@ -35,9 +35,11 @@ else
   export TLOG_RUNNING=1
 fi
 
-if [ ! "${TLOG_RUNNING}" == "0" ]; then
-  if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
-    if [ -f "${TLOG_USERS}" ]; then
+# We must have an active TTY until https://github.com/Scribery/tlog/issues/227
+# is resolved
+if [ -t 1 ] && [ ! "${TLOG_RUNNING}" == "0" ]; then
+  if [ -f "${TLOG_USERS}" ]; then
+    if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
       TLOG_UNAME=`id -nu`
 
       # Formatted for the grep below
