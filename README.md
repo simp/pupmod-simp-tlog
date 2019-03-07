@@ -1,5 +1,3 @@
-
-
 [![License](https://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/73/badge)](https://bestpractices.coreinfrastructure.org/projects/73)
 [![Puppet Forge](https://img.shields.io/puppetforge/v/simp/tlog.svg)](https://forge.puppetlabs.com/simp/tlog)
@@ -88,7 +86,7 @@ session in json format:
 
 ## Development
 
-Please read our [Contribution Guide](http://simp-doc.readthedocs.io/en/stable/contributors_guide/index.html).
+Please read our [Contribution Guide](https://simp.readthedocs.io/en/stable/contributors_guide/index.html).
 
 ### Acceptance tests
 
