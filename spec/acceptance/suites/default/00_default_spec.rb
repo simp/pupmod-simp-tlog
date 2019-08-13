@@ -23,6 +23,11 @@ describe 'tlog' do
   hosts.each do |host|
     context "on #{host}" do
       context 'default parameters' do
+        it 'should enable SIMP dependencies repo for tlog package' do
+          # exclude SIMP repo, as we only want the SIMP deps repo
+          install_simp_repos(host, ['simp'])
+        end
+
         it 'should have the required test shells' do
           host.install_package('bash')
           host.install_package('tcsh')
