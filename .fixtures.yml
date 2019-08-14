@@ -8,8 +8,6 @@ fixtures:
     simplib: https://github.com/simp/pupmod-simp-simplib
     ssh: https://github.com/simp/pupmod-simp-ssh
     stdlib: https://github.com/simp/puppetlabs-stdlib
-    systemd:
-      repo: https://github.com/simp/puppet-systemd
-      branch: simp-master
+    systemd: https://github.com/simp/puppet-systemd
   symlinks:
     tlog: "#{source_dir}"
