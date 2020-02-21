@@ -8,7 +8,7 @@
 #
 #   @see `data/common.yaml`
 #
-# @param syslog_rule
+# @param match_rule
 #   The rule that should be used for matching TLOG rules
 #
 #   * The default is set to match rules on the widest selection of systems
@@ -30,6 +30,8 @@ class tlog::config::rsyslog (
   Boolean              $stop_processing    = true,
   Boolean              $logrotate          = simplib::lookup('simp_options::logrotate', { 'default_value' => false })
 ) {
+  simplib::assert_optional_dependency($module_name, 'simp/rsyslog')
+
   include 'rsyslog'
 
   # named 'XX_tlog' so that it appears before the local filesystem defaults
@@ -40,6 +42,8 @@ class tlog::config::rsyslog (
   }
 
   if $logrotate {
+    simplib::assert_optional_dependency($module_name, 'simp/logrotate')
+
     include 'logrotate'
 
     $_rule_opts = $logrotate_options + {'log_files' => [ $log_file ]}
