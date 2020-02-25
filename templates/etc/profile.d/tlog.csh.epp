@@ -62,7 +62,7 @@ if ( ! ($?TLOG_RUNNING) ) then
             if ( `hostname -f >& /dev/null` ) then
               exec $TLOG_CMD
             else if ( $uid == 0 ) then
-              'Tlog hostname lookup failed, emergency bypass for root'
+              echo 'Tlog hostname lookup failed, emergency bypass for root'
             else
               exec echo 'Tlog hostname lookup failed - access denied'
             endif
