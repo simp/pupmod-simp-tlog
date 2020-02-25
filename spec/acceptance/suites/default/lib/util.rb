@@ -1,7 +1,8 @@
 module TlogTestUtil
-  # Helper method for using a local SSH session for accessing a host and
-  # immediately logging out. This is useful for capturing output messages that
-  # cannot otherwise consistently be accessed via Net::SSH.
+  # Helper method for using accessing a host and immediately logging out.
+  #
+  # This used to be native SSH but was switched to Net::SSH due to
+  # incompatibilities as underlying OS versions progressed.
   #
   # @param host [String]
   #   The host to which to connect
