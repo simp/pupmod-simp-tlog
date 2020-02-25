@@ -58,7 +58,14 @@ if ( ! ($?TLOG_RUNNING) ) then
           set TLOG_PASSTHROUGH_CMD=`ps --no-headers -o args $$ | grep -oe "$TLOG_PATTERN"`
 
           if ( "$TLOG_PASSTHROUGH_CMD" == "" ) then
-            exec $TLOG_CMD
+            # Work around Tlog bug: https://github.com/Scribery/tlog/issues/269
+            if ( `hostname -f >& /dev/null` ) then
+              exec $TLOG_CMD
+            else if ( $uid == 0 ) then
+              'Tlog hostname lookup failed, emergency bypass for root'
+            else
+              exec echo 'Tlog hostname lookup failed - access denied'
+            endif
           endif
         endif
       endif

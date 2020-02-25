@@ -53,14 +53,22 @@ if [ -t 1 ] && [ ! "${TLOG_RUNNING}" == "0" ]; then
         fi
 
         if ! ps --no-headers -o args $$ | grep -qe "-c[[:space:]]\+.\+"; then
-          TLOG_REC_SESSION_SHELL=$SHELL
+          # Work around Tlog bug: https://github.com/Scribery/tlog/issues/269
 
-          # NOTE: Currently there is a bug that affects this that means that
-          # multiple tlog sessions spawned under the same parent process (think
-          # gnome-terminal or tmux/screen windows) will no longer log commands.
-          #
-          # https://github.com/Scribery/tlog/issues/228
-          exec $TLOG_CMD
+          if hostname -f >& /dev/null; then
+            TLOG_REC_SESSION_SHELL=$SHELL
+
+            # NOTE: Currently there is a bug that affects this that means that
+            # multiple tlog sessions spawned under the same parent process (think
+            # gnome-terminal or tmux/screen windows) will no longer log commands.
+            #
+            # https://github.com/Scribery/tlog/issues/228
+            exec $TLOG_CMD
+          elif [ $UID -eq 0 ]; then
+            echo 'Tlog hostname lookup failed, emergency bypass for root'
+          else
+            exec echo 'Tlog hostname lookup failed - access denied'
+          fi
         fi
       fi
     fi
