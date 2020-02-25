@@ -14,6 +14,8 @@ This module manages the installation and configuration of
 By default, the logs will be recorded to `journald` with systems running
 `systemd` and `syslog` otherwise.
 
+See [REFERENCE.md](./REFERENCE.md) for full API details.
+
 ### This is a SIMP module
 
 This module is a component of the [System Integrity Management Platform](https://simp-project.com),

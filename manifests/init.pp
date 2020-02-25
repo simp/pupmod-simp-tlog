@@ -18,9 +18,9 @@ class tlog (
 ) {
   simplib::assert_metadata($module_name)
 
-  include '::tlog::install'
+  include 'tlog::install'
 
   if $manage_rsyslog {
-    include '::tlog::config::rsyslog'
+    include 'tlog::config::rsyslog'
   }
 }

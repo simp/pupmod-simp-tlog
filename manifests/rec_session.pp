@@ -29,6 +29,10 @@
 #   interactive and/or login shells
 #
 # @param shell_hook_users
+#   The list of users that you want to automatically record that will be stored
+#   in `$shell_hook_users_file`
+#
+# @param shell_hook_users_file
 #   The path to the file containing the list of users and/or groups that you
 #   want to automatically record
 #

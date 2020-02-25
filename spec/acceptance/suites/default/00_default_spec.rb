@@ -24,7 +24,7 @@ describe 'tlog' do
     context "on #{host}" do
       context 'default parameters' do
         it 'should enable SIMP dependencies repo for tlog package' do
-          # exclude SIMP repo, as we only want the SIMP deps repo
+          # tlog is incuded for EL8, but this shouldn't cause issues
           install_simp_repos(host, ['simp'])
         end
 
