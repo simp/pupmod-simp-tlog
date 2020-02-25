@@ -17,7 +17,7 @@
   "dependencies": [
     {
       "name": "simp/simplib",
-      "version_requirement": ">= 3.10.0 < 4.0.0"
+      "version_requirement": ">= 3.10.0 < 5.0.0"
     },
     {
       "name": "puppetlabs/stdlib",
@@ -28,11 +28,11 @@
     "optional_dependencies": [
       {
         "name": "simp/logrotate",
-        "version_requirement": ">= 6.5.0 < 7.0.0"
+        "version_requirement": ">= 6.4.0 < 7.0.0"
       },
       {
         "name": "simp/rsyslog",
-        "version_requirement": ">= 7.6.0 < 8.0.0"
+        "version_requirement": ">= 7.5.0 < 8.0.0"
       }
     ]
   },

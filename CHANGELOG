@@ -1,3 +1,12 @@
+* Tue Feb 25 2020 Trevor Vaughan <tvaughan@onyxpoint.com> - 0.2.0
+- Added EL8 support
+- Updated acceptance tests to use net/ssh to prevent issues with large SSH
+  keyrings
+- Added REFERENCE.md and linked into the README.md
+- Added optional dependencies for simp/logrotate and simp/rsyslog
+- Added workaround to scripts in /etc/profile to work around a bug in tlog that
+  would prevent logins if the system hostname could not be found
+
 * Fri Aug 02 2019 Robert Vincent <pillarsdotnet@gmail.com> - 0.2.0
 - Drop Puppet 4 support
 - Add Puppet 6 support
