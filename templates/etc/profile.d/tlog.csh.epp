@@ -59,7 +59,8 @@ if ( ! ($?TLOG_RUNNING) ) then
 
           if ( "$TLOG_PASSTHROUGH_CMD" == "" ) then
             # Work around Tlog bug: https://github.com/Scribery/tlog/issues/269
-            if ( `hostname -f >& /dev/null` ) then
+            hostname -f >& /dev/null
+            if ( $? == 0 ) then
               exec $TLOG_CMD
             else if ( $uid == 0 ) then
               echo 'Tlog hostname lookup failed, emergency bypass for root'

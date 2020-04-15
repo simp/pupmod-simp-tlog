@@ -1,3 +1,6 @@
+* Wed Apr 15 2020 Trevor Vaughan <tvaughan@onyxpoint.com> - 0.2.1
+- Fix tcsh template
+
 * Tue Feb 25 2020 Trevor Vaughan <tvaughan@onyxpoint.com> - 0.2.0
 - Added EL8 support
 - Updated acceptance tests to use net/ssh to prevent issues with large SSH
