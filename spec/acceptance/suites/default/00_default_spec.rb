@@ -25,7 +25,7 @@ describe 'tlog' do
       context 'default parameters' do
         it 'should enable SIMP dependencies repo for tlog package' do
           # tlog is incuded for EL8, but this shouldn't cause issues
-          install_simp_repos(host, ['simp'])
+          install_simp_repos(host)
         end
 
         it 'should have the required test shells' do

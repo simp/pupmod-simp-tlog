@@ -1,6 +1,6 @@
 {
   "name": "simp-tlog",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "simp",
   "summary": "A module for managing Tlog",
   "license": "Apache-2.0",
@@ -40,7 +40,6 @@
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "6",
         "7",
         "8"
       ]
@@ -48,7 +47,6 @@
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
-        "6",
         "7",
         "8"
       ]
@@ -56,7 +54,6 @@
     {
       "operatingsystem": "OracleLinux",
       "operatingsystemrelease": [
-        "6",
         "7",
         "8"
       ]
