@@ -1,14 +1,14 @@
 ---
 fixtures:
   repositories:
-    augeasproviders_core: https://github.com/simp/augeasproviders_core
-    augeasproviders:ssh: https://github.com/simp/augeasproviders_ssh
-    compliance_markup: https://github.com/simp/pupmod-simp-compliance_markup
-    logrotate: https://github.com/simp/pupmod-simp-logrotate
-    rsyslog: https://github.com/simp/pupmod-simp-rsyslog
-    simplib: https://github.com/simp/pupmod-simp-simplib
-    ssh: https://github.com/simp/pupmod-simp-ssh
-    stdlib: https://github.com/simp/puppetlabs-stdlib
-    systemd: https://github.com/simp/puppet-systemd
+    augeasproviders_core: https://github.com/simp/augeasproviders_core.git
+    augeasproviders:ssh: https://github.com/simp/augeasproviders_ssh.git
+    compliance_markup: https://github.com/simp/pupmod-simp-compliance_markup.git
+    logrotate: https://github.com/simp/pupmod-simp-logrotate.git
+    rsyslog: https://github.com/simp/pupmod-simp-rsyslog.git
+    simplib: https://github.com/simp/pupmod-simp-simplib.git
+    ssh: https://github.com/simp/pupmod-simp-ssh.git
+    stdlib: https://github.com/simp/puppetlabs-stdlib.git
+    systemd: https://github.com/simp/puppet-systemd.git
   symlinks:
     tlog: "#{source_dir}"
