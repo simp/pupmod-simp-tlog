@@ -1,3 +1,8 @@
+* Tue Aug 24 2021 Trevor Vaughan <tvaughan@onyxpoint.com> - 0.3.1
+- Fixed
+  - Corrected the logic in `tlog.sh.epp` in the case where a user does not have
+    a login shell
+
 * Thu Jun 17 2021 Chris Tessmer <chris.tessmer@onyxpoint.com> - 0.3.0
 - Removed support for Puppet 5
 - Ensured support for Puppet 7 in requirements and stdlib
