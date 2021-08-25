@@ -39,7 +39,7 @@ fi
 # is resolved
 if [ -t 1 ] && [ ! "${TLOG_RUNNING}" == "0" ]; then
   if [ -f "${TLOG_USERS}" ]; then
-    if [ `getent passwd ${TLOG_UID} | cut -d':' -f7` != "/usr/bin/tlog-rec-session" ]; then
+    if [ "$( getent passwd ${TLOG_UID} | cut -d':' -f7 )" != "/usr/bin/tlog-rec-session" ]; then
       TLOG_UNAME=`id -nu`
 
       # Formatted for the grep below
