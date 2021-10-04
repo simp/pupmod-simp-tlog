@@ -1,6 +1,6 @@
 {
   "name": "simp-tlog",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "simp",
   "summary": "A module for managing Tlog",
   "license": "Apache-2.0",
