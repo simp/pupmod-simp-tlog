@@ -63,6 +63,17 @@ class tlog::rec_session (
     mode    => '0644'
   }
 
+  # Ensure the file resource exists if we are using a file writer
+  if $options['writer'] == 'file' {
+    $_tlog_output_file_opts = {
+      ensure => 'file',
+      owner  => 'tlog',
+      group  => 'tlog',
+      mode   => '0640',
+    }
+    ensure_resource('file', $options['file']['path'], $_tlog_output_file_opts)
+  }
+
   file { '/etc/tlog/tlog-rec-session.conf':
     ensure  => 'file',
     content => sprintf("%s\n", to_json(deep_merge($options, $custom_options))),

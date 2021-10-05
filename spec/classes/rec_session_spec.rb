@@ -82,6 +82,28 @@ describe 'tlog::rec_session' do
 
         end
 
+        context 'with a file writer' do
+          let(:params) {{
+            :options => {
+              'writer' => 'file',
+              'file'   => {
+                'path' => '/var/log/tlog.log'
+              }
+            }
+          }}
+
+#          it_behaves_like 'a structured module'
+
+          it { is_expected.to create_file('/var/log/tlog.log')
+            .with(
+              :ensure => 'file',
+              :owner  => 'tlog',
+              :group  => 'tlog',
+              :mode   => '0640',
+            )
+          }
+        end
+
         context 'custom_options' do
           let(:params) {{
             :custom_options => {

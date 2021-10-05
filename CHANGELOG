@@ -1,3 +1,6 @@
+* Mon Oct 04 2021 Kendall Moore <kendall.moore@onyxpoint.com> - 0.3.2
+- Added file resource if file writer is specified
+
 * Tue Aug 24 2021 Trevor Vaughan <tvaughan@onyxpoint.com> - 0.3.1
 - Fixed
   - Corrected the logic in `tlog.sh.epp` in the case where a user does not have
