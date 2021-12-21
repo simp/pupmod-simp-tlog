@@ -39,6 +39,7 @@ describe 'tlog::config::rsyslog' do
           it {
             is_expected.to create_logrotate__rule('tlog').with({
               :log_files                 => [ current_class[:log_file] ],
+              :create                    => current_class[:logrotate_create],
               :missingok                 => current_class[:logrotate_options]['missingok'],
               :lastaction_restart_logger => current_class[:logrotate_options]['lastaction_restart_logger']
             })
