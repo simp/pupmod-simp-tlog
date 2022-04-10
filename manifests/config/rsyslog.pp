@@ -17,6 +17,9 @@
 # @param log_file
 #   The log file in which to save the `tlog` logs
 #
+# @param logrotate_create
+#   The create options to specify in the logrotate rule
+#
 # @param stop_processing
 #   Cease processing syslog rules after processing this rule
 #
@@ -24,11 +27,12 @@
 #   Enable log rotation for `$log_file`
 #
 class tlog::config::rsyslog (
-  Hash                 $logrotate_options,
-  String[1]            $match_rule         = '$programname == \'tlog-rec-session\' or $programname == \'-tlog-rec-session\' or $programname == \'tlog\'',
-  Stdlib::Absolutepath $log_file           = '/var/log/tlog.log',
-  Boolean              $stop_processing    = true,
-  Boolean              $logrotate          = simplib::lookup('simp_options::logrotate', { 'default_value' => false })
+  Hash                   $logrotate_options,
+  String[1]              $match_rule       = '$programname == \'tlog-rec-session\' or $programname == \'-tlog-rec-session\' or $programname == \'tlog\'',
+  Stdlib::Absolutepath   $log_file         = '/var/log/tlog.log',
+  Pattern['\d{4} .+ .+'] $logrotate_create = '0640 tlog tlog',
+  Boolean                $stop_processing  = true,
+  Boolean                $logrotate        = simplib::lookup('simp_options::logrotate', { 'default_value' => false })
 ) {
   simplib::assert_optional_dependency($module_name, 'simp/rsyslog')
 
@@ -46,7 +50,7 @@ class tlog::config::rsyslog (
 
     include 'logrotate'
 
-    $_rule_opts = $logrotate_options + {'log_files' => [ $log_file ]}
+    $_rule_opts = $logrotate_options + {'log_files' => [ $log_file ]} + {'create' => $logrotate_create}
 
     logrotate::rule { 'tlog': * => $_rule_opts }
   }

@@ -91,6 +91,14 @@ The log file in which to save the `tlog` logs
 
 Default value: '/var/log/tlog.log'
 
+##### `logrotate_create`
+
+Data type: `Pattern['\d{4} .+ .+']`
+
+The create options to specify in the logrotate rule
+
+Default value: '0640 tlog tlog'
+
 ##### `stop_processing`
 
 Data type: `Boolean`

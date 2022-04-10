@@ -1,3 +1,6 @@
+* Tue Dec 21 2021 Kendall Moore <kendall@sicura.us> - 0.3.3
+- Update default logrotate create options to tlog:tlog
+
 * Mon Oct 04 2021 Kendall Moore <kendall.moore@onyxpoint.com> - 0.3.2
 - Added file resource if file writer is specified
 
