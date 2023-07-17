@@ -1,3 +1,6 @@
+* Mon Jun 12 2023 Chris Tessmer <chris.tessmer@onyxpoint.com> - 0.4.0
+- Add RockyLinux 8 support
+
 * Tue Dec 21 2021 Kendall Moore <kendall@sicura.us> - 0.3.3
 - Update default logrotate create options to tlog:tlog
 

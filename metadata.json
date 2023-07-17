@@ -1,6 +1,6 @@
 {
   "name": "simp-tlog",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "author": "simp",
   "summary": "A module for managing Tlog",
   "license": "Apache-2.0",
@@ -21,7 +21,7 @@
     },
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 6.6.0 < 8.0.0"
+      "version_requirement": ">= 8.0.0 < 9.0.0"
     }
   ],
   "simp": {
@@ -55,6 +55,12 @@
       "operatingsystem": "OracleLinux",
       "operatingsystemrelease": [
         "7",
+        "8"
+      ]
+    },
+    {
+      "operatingsystem": "Rocky",
+      "operatingsystemrelease": [
         "8"
       ]
     }
