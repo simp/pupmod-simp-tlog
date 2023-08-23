@@ -1,6 +1,6 @@
 {
   "name": "simp-tlog",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "simp",
   "summary": "A module for managing Tlog",
   "license": "Apache-2.0",
@@ -60,6 +60,12 @@
     },
     {
       "operatingsystem": "Rocky",
+      "operatingsystemrelease": [
+        "8"
+      ]
+    },
+    {
+      "operatingsystem": "AlmaLinux",
       "operatingsystemrelease": [
         "8"
       ]
