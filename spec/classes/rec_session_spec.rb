@@ -7,7 +7,7 @@ describe 'tlog::rec_session' do
     it { is_expected.to create_class('tlog') }
     it { is_expected.to create_class('tlog::install').that_comes_before('File[/etc/tlog/tlog-rec-session.conf]') }
 
-    it { is_expected.to create_file('/etc/tlog/tlog-rec-session.conf').with(file_attrs.merge({:ensure => 'file'})) }
+    it { is_expected.to create_file('/etc/tlog/tlog-rec-session.conf').with(file_attrs.merge({ ensure: 'file' })) }
 
     it {
       res = catalogue.resource('File[/etc/tlog/tlog-rec-session.conf]')
@@ -19,8 +19,8 @@ describe 'tlog::rec_session' do
       tlog_cmd_var = %(TLOG_CMD="#{current_class[:shell_hook_cmd]}")
 
       is_expected.to create_file('/etc/profile.d/00-simp-tlog.sh').with(file_attrs)
-      is_expected.to create_file('/etc/profile.d/00-simp-tlog.sh').with_content(%r(#{tlog_users_var}))
-      is_expected.to create_file('/etc/profile.d/00-simp-tlog.sh').with_content(%r(#{tlog_cmd_var}))
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.sh').with_content(%r{#{tlog_users_var}})
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.sh').with_content(%r{#{tlog_cmd_var}})
     }
 
     it {
@@ -28,8 +28,8 @@ describe 'tlog::rec_session' do
       tlog_cmd_var = %(set TLOG_CMD="#{current_class[:shell_hook_cmd]}")
 
       is_expected.to create_file('/etc/profile.d/00-simp-tlog.csh').with(file_attrs)
-      is_expected.to create_file('/etc/profile.d/00-simp-tlog.csh').with_content(%r(#{tlog_users_var}))
-      is_expected.to create_file('/etc/profile.d/00-simp-tlog.csh').with_content(%r(#{tlog_cmd_var}))
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.csh').with_content(%r{#{tlog_users_var}})
+      is_expected.to create_file('/etc/profile.d/00-simp-tlog.csh').with_content(%r{#{tlog_cmd_var}})
     }
 
     it { is_expected.to create_file('/etc/security/tlog.users').with_content("#{current_class[:shell_hook_users].join("\n")}\n") }
@@ -41,105 +41,122 @@ describe 'tlog::rec_session' do
         let(:facts) do
           os_facts
         end
+        let(:file_attrs) do
+          {
+            ensure: 'file',
+         owner: 'root',
+         group: 'root',
+         mode: '0644'
+          }
+        end
 
         let(:current_class) do
           catalogue.resource("Class[#{class_name}]")
         end
 
         if os_facts[:systemd]
-          let(:conf_content){{
-            'shell'  => '/bin/bash',
-            'writer' => 'journal',
-            'log'    => {
-              'input' => false
+          let(:conf_content) do
+            {
+              'shell'  => '/bin/bash',
+           'writer' => 'journal',
+           'log'    => {
+             'input' => false
+           }
             }
-          }}
+          end
         else
-          let(:conf_content){{
-            'shell'  => '/bin/bash',
-            'writer' => 'syslog',
-            'log'    => {
-              'input' => false
+          let(:conf_content) do
+            {
+              'shell'  => '/bin/bash',
+           'writer' => 'syslog',
+           'log'    => {
+             'input' => false
+           }
             }
-          }}
+          end
         end
 
-        let(:file_attrs){{
-          :ensure  => 'file',
-          :owner   => 'root',
-          :group   => 'root',
-          :mode    => '0644'
-        }}
-
         context 'without any parameters' do
-          let(:params) {{ }}
+          let(:params) { {} }
 
           it_behaves_like 'a structured module'
 
           it { is_expected.to create_class('tlog::install').that_comes_before('File[/etc/profile.d/00-simp-tlog.sh]') }
           it { is_expected.to create_class('tlog::install').that_comes_before('File[/etc/profile.d/00-simp-tlog.csh]') }
           it { is_expected.to create_class('tlog::install').that_comes_before('File[/etc/security/tlog.users]') }
-
         end
 
         context 'with a file writer' do
-          let(:params) {{
-            :options => {
-              'writer' => 'file',
-              'file'   => {
-                'path' => '/var/log/tlog.log'
+          let(:params) do
+            {
+              options: {
+                'writer' => 'file',
+                'file'   => {
+                  'path' => '/var/log/tlog.log'
+                }
               }
             }
-          }}
+          end
 
-#          it_behaves_like 'a structured module'
+          #          it_behaves_like 'a structured module'
 
-          it { is_expected.to create_file('/var/log/tlog.log')
-            .with(
-              :ensure => 'file',
-              :owner  => 'tlog',
-              :group  => 'tlog',
-              :mode   => '0640',
+          it {
+            is_expected.to create_file('/var/log/tlog.log')
+              .with(
+              ensure: 'file',
+              owner: 'tlog',
+              group: 'tlog',
+              mode: '0640',
             )
           }
         end
 
         context 'custom_options' do
-          let(:params) {{
-            :custom_options => {
-              'shell'  => '/bin/sh',
-              'writer' => 'we do not verify these'
+          let(:params) do
+            {
+              custom_options: {
+                'shell'  => '/bin/sh',
+                'writer' => 'we do not verify these'
+              }
             }
-          }}
+          end
 
-          let(:conf_content){{
-            'shell'  => params[:custom_options]['shell'],
-            'writer' => params[:custom_options]['writer'],
-            'log'    => {
-              'input' => false
+          let(:conf_content) do
+            {
+              'shell' => params[:custom_options]['shell'],
+           'writer' => params[:custom_options]['writer'],
+           'log'    => {
+             'input' => false
+           }
             }
-          }}
+          end
 
           it_behaves_like 'a structured module'
         end
 
         context 'shell_hook' do
           context 'disabled' do
-            let(:params){{
-              :shell_hook => false
-            }}
+            let(:params) do
+              {
+                shell_hook: false
+              }
+            end
 
-            let(:file_attrs){{
-              :ensure  => 'absent'
-            }}
+            let(:file_attrs) do
+              {
+                ensure: 'absent'
+              }
+            end
 
             it_behaves_like 'a structured module'
           end
 
           context 'users defined' do
-            let(:params){{
-              :shell_hook_users => ['root', 'bob', '%alice']
-            }}
+            let(:params) do
+              {
+                shell_hook_users: ['root', 'bob', '%alice']
+              }
+            end
 
             it_behaves_like 'a structured module'
           end
