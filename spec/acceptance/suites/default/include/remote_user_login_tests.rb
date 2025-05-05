@@ -7,15 +7,15 @@ shared_context 'remote user logins' do |host|
 
   context 'user' do
     let(:hidepid) do
-      _hidepid = false
+      retval = false
 
       if on(host, 'findmnt -n /proc').output.strip =~ %r{hidepid=(\d+)}
         if Regexp.last_match(1) != '0'
-          _hidepid = true
+          retval = true
         end
       end
 
-      _hidepid
+      retval
     end
 
     let(:ssh_ip) { host[:ip] }
@@ -57,7 +57,7 @@ shared_context 'remote user logins' do |host|
         on(host, %(puppet resource user #{test_user} password='#{test_pass_hash}'))
       end
 
-      it 'successfullies login' do
+      it 'successfully logs in' do # rubocop:disable RSpec/RepeatedExample
         session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
         expect(session_info[:output]).not_to match(%r{TLog Error})
         expect(session_info[:success]).to be true
@@ -68,7 +68,7 @@ shared_context 'remote user logins' do |host|
         apply_manifest_on(host, manifest, catch_failures: true)
       end
 
-      it 'successfullies login' do
+      it 'successfully logs in again' do # rubocop:disable RSpec/RepeatedExample
         session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
         expect(session_info[:output]).not_to match(%r{TLog Error})
         expect(session_info[:success]).to be true
@@ -84,7 +84,7 @@ shared_context 'remote user logins' do |host|
             on(host, %(puppet resource user #{test_user} password='#{test_pass_hash}' managehome=true shell='/bin/#{shell}'))
           end
 
-          it 'successfullies login' do
+          it 'successfully logs in' do # rubocop:disable RSpec/RepeatedExample
             session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
             expect(session_info[:output]).not_to match(%r{TLog Error})
             expect(session_info[:success]).to be true
@@ -102,7 +102,7 @@ shared_context 'remote user logins' do |host|
             end
           end
 
-          it 'successfullies login' do
+          it 'successfully logs in again' do # rubocop:disable RSpec/RepeatedExample
             session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
             expect(session_info[:output]).not_to match(%r{TLog Error})
             expect(session_info[:success]).to be true
