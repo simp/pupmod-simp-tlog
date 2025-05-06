@@ -8,10 +8,10 @@ describe 'tlog::config::rsyslog' do
 
     it {
       is_expected.to create_rsyslog__rule__local('XX_tlog').with({
-        :rule            => current_class[:match_rule],
-        :target_log_file => current_class[:log_file],
-        :stop_processing => current_class[:stop_processing]
-      })
+                                                                   rule: current_class[:match_rule],
+        target_log_file: current_class[:log_file],
+        stop_processing: current_class[:stop_processing]
+                                                                 })
     }
   end
 
@@ -27,22 +27,26 @@ describe 'tlog::config::rsyslog' do
         end
 
         context 'without any parameters' do
-          let(:params) {{ }}
+          let(:params) { {} }
+
           it_behaves_like 'a structured module'
         end
 
         context 'when enabling logrotate' do
-          let(:params){{
-            :logrotate      => true
-          }}
+          let(:params) do
+            {
+              logrotate: true
+            }
+          end
+
           it_behaves_like 'a structured module'
           it {
             is_expected.to create_logrotate__rule('tlog').with({
-              :log_files                 => [ current_class[:log_file] ],
-              :create                    => current_class[:logrotate_create],
-              :missingok                 => current_class[:logrotate_options]['missingok'],
-              :lastaction_restart_logger => current_class[:logrotate_options]['lastaction_restart_logger']
-            })
+                                                                 log_files: [ current_class[:log_file] ],
+              create: current_class[:logrotate_create],
+              missingok: current_class[:logrotate_options]['missingok'],
+              lastaction_restart_logger: current_class[:logrotate_options]['lastaction_restart_logger']
+                                                               })
           }
         end
       end

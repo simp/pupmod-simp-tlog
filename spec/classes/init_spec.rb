@@ -15,14 +15,18 @@ describe 'tlog' do
         end
 
         context 'without any parameters' do
-          let(:params) {{ }}
+          let(:params) { {} }
+
           it_behaves_like 'a structured module'
         end
 
         context 'when managing syslog' do
-          let(:params){{
-            :manage_rsyslog => true
-          }}
+          let(:params) do
+            {
+              manage_rsyslog: true
+            }
+          end
+
           it_behaves_like 'a structured module'
           it { is_expected.to create_class('tlog::config::rsyslog') }
         end
