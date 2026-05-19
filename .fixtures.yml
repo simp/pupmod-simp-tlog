@@ -3,7 +3,6 @@ fixtures:
   repositories:
     augeasproviders_core: https://github.com/simp/augeasproviders_core.git
     augeasproviders:ssh: https://github.com/simp/augeasproviders_ssh.git
-    compliance_markup: https://github.com/simp/pupmod-simp-compliance_markup.git
     logrotate: https://github.com/simp/pupmod-simp-logrotate.git
     rsyslog: https://github.com/simp/pupmod-simp-rsyslog.git
     simplib: https://github.com/simp/pupmod-simp-simplib.git
