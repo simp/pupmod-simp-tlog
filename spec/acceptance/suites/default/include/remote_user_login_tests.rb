@@ -59,7 +59,7 @@ shared_context 'remote user logins' do |host|
 
       it 'successfully logs in' do # rubocop:disable RSpec/RepeatedExample
         session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-        expect(session_info[:output]).not_to match(%r{TLog Error})
+        expect(session_info[:output]).not_to include('TLog Error')
         expect(session_info[:success]).to be true
       end
 
@@ -70,7 +70,7 @@ shared_context 'remote user logins' do |host|
 
       it 'successfully logs in again' do # rubocop:disable RSpec/RepeatedExample
         session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-        expect(session_info[:output]).not_to match(%r{TLog Error})
+        expect(session_info[:output]).not_to include('TLog Error')
         expect(session_info[:success]).to be true
       end
     end
@@ -86,7 +86,7 @@ shared_context 'remote user logins' do |host|
 
           it 'successfully logs in' do # rubocop:disable RSpec/RepeatedExample
             session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-            expect(session_info[:output]).not_to match(%r{TLog Error})
+            expect(session_info[:output]).not_to include('TLog Error')
             expect(session_info[:success]).to be true
           end
 
@@ -104,7 +104,7 @@ shared_context 'remote user logins' do |host|
 
           it 'successfully logs in again' do # rubocop:disable RSpec/RepeatedExample
             session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-            expect(session_info[:output]).not_to match(%r{TLog Error})
+            expect(session_info[:output]).not_to include('TLog Error')
             expect(session_info[:success]).to be true
           end
 
@@ -121,7 +121,7 @@ shared_context 'remote user logins' do |host|
 
               it 'attempts to login' do
                 session_info = local_ssh(ssh_ip, ssh_port, test_user, test_pass)
-                expect(session_info[:output]).not_to match(%r{TLog Error})
+                expect(session_info[:output]).not_to include('TLog Error')
                 expect(session_info[:success]).to be true
               end
             end
