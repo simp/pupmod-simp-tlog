@@ -25,9 +25,19 @@ describe 'tlog' do
   hosts.each do |host|
     context "on #{host}" do
       context 'default parameters' do
-        it 'enables SIMP dependencies repo for tlog package' do
-          # tlog is incuded for EL8, but this shouldn't cause issues
-          install_simp_repos(host)
+        it 'enables a package repository for the tlog package' do
+          # The `tlog`, `rsyslog`, and `logrotate` packages all ship in the OS
+          # repositories (AppStream/BaseOS) on EL8+, so the SIMP community repo
+          # is not strictly required here. However, a `simp-release-community`
+          # RPM is currently only published for EL7/EL8; on EL9+ that URL 404s.
+          # Install the SIMP repos where the release RPM is available and fall
+          # back to EPEL elsewhere so the suite runs across the full OS matrix.
+          release = fact_on(host, 'os.release.major').to_s
+          if ['7', '8'].include?(release)
+            install_simp_repos(host)
+          else
+            enable_epel_on(host)
+          end
         end
 
         it 'has the required test shells' do

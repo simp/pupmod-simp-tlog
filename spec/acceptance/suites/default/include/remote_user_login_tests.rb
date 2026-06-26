@@ -19,7 +19,12 @@ shared_context 'remote user logins' do |host|
     end
 
     let(:ssh_ip) { host[:ip] }
-    let(:ssh_port) { host.options[:ssh][:port] }
+    # NOTE: Use `host[:ssh]` (not `host.options[:ssh]`) so that the
+    # host-level SSH connection info is used. Under the docker hypervisor the
+    # SUT's sshd is reached via a forwarded port on 127.0.0.1, and only the
+    # host-level `ssh` hash carries that mapped port; the global options hash
+    # still reports the default port 22.
+    let(:ssh_port) { host[:ssh][:port] }
 
     let(:test_pass) { 'Test passw0rd @f some l3ngth' }
     let(:test_pass_hash) do
