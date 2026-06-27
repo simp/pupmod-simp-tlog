@@ -15,7 +15,7 @@ HOSTS:
       - 'yum install -y rsync openssl openssh-server'
     dockeropts:
       HostConfig:
-        Memory: 536870912
+        Memory: 1073741824
         Privileged: true
 CONFIG:
   log_level: verbose

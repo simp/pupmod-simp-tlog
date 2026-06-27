@@ -4,6 +4,9 @@ require 'yaml'
 require 'simp/beaker_helpers'
 include Simp::BeakerHelpers
 
+require_relative 'acceptance/suites/default/lib/util'
+include TlogTestUtil
+
 unless ENV['BEAKER_provision'] == 'no'
   hosts.each do |host|
     # Install Puppet
@@ -44,6 +47,17 @@ RSpec.configure do |c|
 
     # add PKI keys
     copy_keydist_to(server)
+
+    # On container SUTs, relax the rsyslog.service sandboxing that otherwise
+    # prevents rsyslogd from starting under restrictive container runtimes
+    # (e.g. GitHub Actions Docker). tlog manages rsyslog via the simp/rsyslog
+    # dependency, so the service must come up for the suite to pass.
+    hosts.each { |sut| relax_rsyslog_sandboxing_on_containers(sut) }
+
+    # The tlog profile scripts gate session recording on `hostname -f`, which is
+    # absent on minimal EL8+ images. Install it up front so recording is
+    # deterministic instead of depending on install ordering.
+    hosts.each { |sut| ensure_hostname_command(sut) }
   rescue StandardError, ScriptError => e
     raise e unless ENV['PRY']
     require 'pry'
