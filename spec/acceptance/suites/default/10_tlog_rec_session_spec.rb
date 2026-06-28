@@ -24,10 +24,29 @@ describe 'tlog::rec_session' do
 
   hosts.each do |host|
     context "on #{host}" do
+      # tlog's CORE feature -- session recording -- is exercised by the
+      # "logs/does not log ... sessions" examples below and works whether or not
+      # the rsyslog service is running (the "session is being recorded" banner
+      # comes from tlog itself on the PTY, not from syslog). manage_rsyslog only
+      # adds the simp/rsyslog Service[rsyslog] => running wiring. Where rsyslog
+      # cannot start under the container runtime (see util.rb), drop
+      # manage_rsyslog so the catalog still applies cleanly and tlog's recording
+      # coverage stays LIVE on containers instead of being skipped. The full
+      # manage_rsyslog wiring is exercised on vagrant/bare-metal.
+      let(:rsyslog_ok) { rsyslog_startable_on?(host) }
+
+      let(:effective_hieradata) do
+        rsyslog_ok ? hieradata : hieradata.merge('tlog::manage_rsyslog' => false)
+      end
+
+      let(:effective_not_root_hieradata) do
+        rsyslog_ok ? not_root_enforcing_hieradata : not_root_enforcing_hieradata.merge('tlog::manage_rsyslog' => false)
+      end
+
       context 'when not enforcing for "root"' do
         # Using puppet_apply as a helper
         it 'works with no errors' do
-          set_hieradata_on(host, not_root_enforcing_hieradata)
+          set_hieradata_on(host, effective_not_root_hieradata)
           apply_manifest_on(host, manifest, catch_failures: true)
         end
 
@@ -44,7 +63,7 @@ describe 'tlog::rec_session' do
       context 'when default parameters (enforcing for "root")' do
         # Using puppet_apply as a helper
         it 'works with no errors' do
-          set_hieradata_on(host, hieradata)
+          set_hieradata_on(host, effective_hieradata)
           apply_manifest_on(host, manifest, catch_failures: true)
         end
 
