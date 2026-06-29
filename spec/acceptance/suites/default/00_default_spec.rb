@@ -24,16 +24,6 @@ describe 'tlog' do
 
   hosts.each do |host|
     context "on #{host}" do
-      # Where rsyslog cannot start under the container runtime (see util.rb),
-      # drop manage_rsyslog so `include 'tlog'` still applies cleanly and the
-      # tlog install/config coverage stays live; the rsyslog Service wiring is
-      # validated on vagrant/bare-metal.
-      let(:rsyslog_ok) { rsyslog_startable_on?(host) }
-
-      let(:effective_hieradata) do
-        rsyslog_ok ? hieradata : hieradata.merge('tlog::manage_rsyslog' => false)
-      end
-
       context 'default parameters' do
         it 'enables a package repository for the tlog package' do
           # The `tlog`, `rsyslog`, and `logrotate` packages all ship in the OS
@@ -57,7 +47,7 @@ describe 'tlog' do
 
         # Using puppet_apply as a helper
         it 'works with no errors' do
-          set_hieradata_on(host, effective_hieradata)
+          set_hieradata_on(host, hieradata)
           apply_manifest_on(host, manifest, catch_failures: true)
         end
 

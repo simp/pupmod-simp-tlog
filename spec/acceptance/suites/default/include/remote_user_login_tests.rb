@@ -9,8 +9,11 @@ shared_context 'remote user logins' do |host|
     let(:hidepid) do
       retval = false
 
-      if on(host, 'findmnt -n /proc').output.strip =~ %r{hidepid=(\d+)}
-        if Regexp.last_match(1) != '0'
+      # Newer kernels (EL10) render `hidepid=2` as `hidepid=invisible` in
+      # findmnt output; accept either spelling so hidepid detection works
+      # across the OS matrix.
+      if on(host, 'findmnt -n /proc').output.strip =~ %r{hidepid=(\S+)}
+        if !['0', 'off'].include?(Regexp.last_match(1))
           retval = true
         end
       end
@@ -19,12 +22,7 @@ shared_context 'remote user logins' do |host|
     end
 
     let(:ssh_ip) { host[:ip] }
-    # NOTE: Use `host[:ssh]` (not `host.options[:ssh]`) so that the
-    # host-level SSH connection info is used. Under the docker hypervisor the
-    # SUT's sshd is reached via a forwarded port on 127.0.0.1, and only the
-    # host-level `ssh` hash carries that mapped port; the global options hash
-    # still reports the default port 22.
-    let(:ssh_port) { host[:ssh][:port] }
+    let(:ssh_port) { host.options[:ssh][:port] }
 
     let(:test_pass) { 'Test passw0rd @f some l3ngth' }
     let(:test_pass_hash) do

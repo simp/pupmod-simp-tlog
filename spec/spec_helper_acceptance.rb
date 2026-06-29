@@ -48,12 +48,6 @@ RSpec.configure do |c|
     # add PKI keys
     copy_keydist_to(server)
 
-    # On container SUTs, relax the rsyslog.service sandboxing that otherwise
-    # prevents rsyslogd from starting under restrictive container runtimes
-    # (e.g. GitHub Actions Docker). tlog manages rsyslog via the simp/rsyslog
-    # dependency, so the service must come up for the suite to pass.
-    hosts.each { |sut| relax_rsyslog_sandboxing_on_containers(sut) }
-
     # The tlog profile scripts gate session recording on `hostname -f`, which is
     # absent on minimal EL8+ images. Install it up front so recording is
     # deterministic instead of depending on install ordering.
