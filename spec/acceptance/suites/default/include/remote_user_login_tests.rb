@@ -13,7 +13,7 @@ shared_context 'remote user logins' do |host|
       # findmnt output; accept either spelling so hidepid detection works
       # across the OS matrix.
       if on(host, 'findmnt -n /proc').output.strip =~ %r{hidepid=(\S+)}
-        if !['0', 'off'].include?(Regexp.last_match(1))
+        unless ['0', 'off'].include?(Regexp.last_match(1))
           retval = true
         end
       end
