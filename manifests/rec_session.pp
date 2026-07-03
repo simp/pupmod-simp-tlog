@@ -49,7 +49,7 @@ class tlog::rec_session (
   Tlog::RecSessionConf $options,
   Hash                 $custom_options        = {},
   Boolean              $shell_hook            = true,
-  Array[String[1]]     $shell_hook_users      = [ 'root' ],
+  Array[String[1]]     $shell_hook_users      = ['root'],
   Stdlib::Absolutepath $shell_hook_users_file = '/etc/security/tlog.users',
   Stdlib::Absolutepath $shell_hook_cmd        = '/usr/bin/tlog-rec-session'
 ) {
