@@ -1,4 +1,26 @@
 module TlogTestUtil
+  # Ensure the `hostname` command is available on the SUT.
+  #
+  # The tlog profile drop-ins (templates/etc/profile.d/tlog.{sh,csh}.epp) gate
+  # session recording on `hostname -f` succeeding:
+  #
+  #   if hostname -f >& /dev/null; then exec $TLOG_CMD
+  #   elif [ $UID -eq 0 ]; then echo 'Tlog hostname lookup failed, emergency bypass for root'
+  #   else exec echo 'Tlog hostname lookup failed - access denied'
+  #
+  # On minimal EL8+ images the `hostname` binary (from the `hostname` package) is
+  # not installed by default. When it is missing the command exits non-zero, so
+  # tlog takes the bypass/deny branch and never starts recording -- which makes
+  # the "logs root sessions" assertions fail nondeterministically depending on
+  # whether some other package happened to pull in `hostname` first. Installing it
+  # explicitly makes the recording behavior deterministic across the OS matrix.
+  #
+  # @param host [Beaker::Host]
+  #   The SUT to configure
+  def ensure_hostname_command(host)
+    host.install_package('hostname')
+  end
+
   # Helper method for using accessing a host and immediately logging out.
   #
   # This used to be native SSH but was switched to Net::SSH due to

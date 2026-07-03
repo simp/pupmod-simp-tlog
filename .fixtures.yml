@@ -9,5 +9,3 @@ fixtures:
     ssh: https://github.com/simp/pupmod-simp-ssh.git
     stdlib: https://github.com/simp/puppetlabs-stdlib.git
     systemd: https://github.com/simp/puppet-systemd.git
-  symlinks:
-    tlog: "#{source_dir}"

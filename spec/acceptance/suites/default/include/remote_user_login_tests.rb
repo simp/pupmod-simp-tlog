@@ -9,8 +9,11 @@ shared_context 'remote user logins' do |host|
     let(:hidepid) do
       retval = false
 
-      if on(host, 'findmnt -n /proc').output.strip =~ %r{hidepid=(\d+)}
-        if Regexp.last_match(1) != '0'
+      # Newer kernels (EL10) render `hidepid=2` as `hidepid=invisible` in
+      # findmnt output; accept either spelling so hidepid detection works
+      # across the OS matrix.
+      if on(host, 'findmnt -n /proc').output.strip =~ %r{hidepid=(\S+)}
+        unless ['0', 'off'].include?(Regexp.last_match(1))
           retval = true
         end
       end

@@ -5,7 +5,7 @@
 class tlog::install {
   assert_private()
 
-  package { $::tlog::package_name:
-    ensure => $::tlog::package_ensure
+  package { $tlog::package_name:
+    ensure => $tlog::package_ensure
   }
 }

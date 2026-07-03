@@ -50,7 +50,7 @@ class tlog::config::rsyslog (
 
     include 'logrotate'
 
-    $_rule_opts = $logrotate_options + {'log_files' => [ $log_file ]} + {'create' => $logrotate_create}
+    $_rule_opts = $logrotate_options + { 'log_files' => [$log_file] } + { 'create' => $logrotate_create }
 
     logrotate::rule { 'tlog': * => $_rule_opts }
   }
