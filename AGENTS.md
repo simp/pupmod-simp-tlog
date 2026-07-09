@@ -125,7 +125,7 @@ through `simplib::lookup` with an explicit default:
 |----------|-----|-----------------|--------|
 | `init.pp` | `simp_options::package_ensure` | `'installed'` | package ensure |
 | `init.pp` | `simp_options::syslog` | `false` | drives `$manage_rsyslog` → pulls in `tlog::config::rsyslog` |
-| `config/rsyslog.pp` | `simp_options::logrotate` | `false` | drives `$logrotate` → logrotate rule + `simp/logrotate` assertion |
+| `manifests/config/rsyslog.pp` | `simp_options::logrotate` | `false` | drives `$logrotate` → logrotate rule + `simp/logrotate` assertion |
 
 Keep routing SIMP toggles through `simplib::lookup('simp_options::*', {
 'default_value' => ... })` with an explicit default rather than assuming
@@ -160,8 +160,8 @@ Keep routing SIMP toggles through `simplib::lookup('simp_options::*', {
   `simp/rsyslog` and `simp/logrotate` are declared as *optional* in
   `metadata.json` and guarded at runtime by
   `simplib::assert_optional_dependency` — `simp/rsyslog` at
-  `config/rsyslog.pp` (whenever rsyslog config runs) and `simp/logrotate` at
-  `config/rsyslog.pp` (only when `$logrotate` is true). If the feature is
+  `manifests/config/rsyslog.pp` (whenever rsyslog config runs) and `simp/logrotate` at
+  `manifests/config/rsyslog.pp` (only when `$logrotate` is true). If the feature is
   off, the module works without those modules installed.
 - **`tlog::rec_session` requires `$options`.** It has no default and is
   typed `Tlog::RecSessionConf`; the value comes from Hiera
@@ -183,9 +183,9 @@ required **only** when the corresponding feature is enabled, and asserted at
 runtime with `simplib::assert_optional_dependency`:
 
 - `simp/rsyslog` `>= 7.6.0 < 9.0.0` — needed when rsyslog config runs
-  (asserted `config/rsyslog.pp`).
+  (asserted `manifests/config/rsyslog.pp`).
 - `simp/logrotate` `>= 6.5.0 < 7.0.0` — needed when `$logrotate` is true
-  (asserted `config/rsyslog.pp`).
+  (asserted `manifests/config/rsyslog.pp`).
 
 Runtime requirement (from `metadata.json` `requirements`):
 `puppet >= 7.0.0 < 9.0.0`. This is the older SIMP baseline — the module is
@@ -281,7 +281,7 @@ require `spec/spec_helper.rb` (the standard puppetsync helper, `require`).
 - Guard optional integrations (`rsyslog`, `logrotate`) with
   `simplib::assert_optional_dependency` before `include`ing them — don't add
   them as hard dependencies, and don't `include` an optional module without
-  asserting it first, as `config/rsyslog.pp` does.
+  asserting it first, as `manifests/config/rsyslog.pp` does.
 - Validate structured config through the `Tlog::RecSessionConf` type; reserve
   `$custom_options` for genuinely arbitrary/unvalidated settings.
 - `Gemfile`, `spec/spec_helper.rb`, and `.github/workflows/pr_tests.yml` carry
