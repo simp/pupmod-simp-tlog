@@ -266,8 +266,7 @@ Relevant gem pins (from `Gemfile`): `rubocop ~> 1.88.0` (`Gemfile`),
 ~> 5.24.0` (`Gemfile`), `simp-beaker-helpers ~> 2.0.0` (`Gemfile`). The
 Puppet gem is pulled **only** via `gem 'puppet', puppet_version` (`Gemfile`),
 where `puppet_version` defaults to `['>= 7', '< 9']` (`Gemfile`). Unit specs
-require `spec/spec_helper.rb` (the standard puppetsync helper, `require` at
-line 11).
+require `spec/spec_helper.rb` (the standard puppetsync helper, `require`).
 
 ## Conventions
 
