@@ -25,42 +25,42 @@ The module does three things:
 The main `tlog` class only installs the package and (conditionally) pulls in
 rsyslog configuration; the shell-hook / session-configuration logic lives in
 `tlog::rec_session`, which is deliberately decoupled because upstream tlog
-moves fast (`manifests/rec_session.pp:1-5`).
+moves fast (`manifests/rec_session.pp`).
 
 ### Business logic
 
 Four classes, one custom data type, no defines.
 
-- **`tlog` (`manifests/init.pp:14-26`)** — public entry class. Consumers
-  `include 'tlog'`. Parameters (`init.pp:15-17`):
+- **`tlog` (`manifests/init.pp`)** — public entry class. Consumers
+  `include 'tlog'`. Parameters (`init.pp`):
   - `$package_name` (`String[1]`, default `'tlog'`).
   - `$package_ensure` (`String[1]`) — defaults to
     `simplib::lookup('simp_options::package_ensure', { 'default_value' => 'installed' })`
-    (`init.pp:16`).
+    (`init.pp`).
   - `$manage_rsyslog` (`Boolean`) — defaults to
     `simplib::lookup('simp_options::syslog', { 'default_value' => false })`
-    (`init.pp:17`). When true, `include 'tlog::config::rsyslog'`
-    (`init.pp:23-25`).
+    (`init.pp`). When true, `include 'tlog::config::rsyslog'`
+    (`init.pp`).
 
-  It always `include`s `tlog::install` (`init.pp:21`) and asserts module
-  metadata (`init.pp:19`).
+  It always `include`s `tlog::install` (`init.pp`) and asserts module
+  metadata (`init.pp`).
 
-- **`tlog::install` (`manifests/install.pp:5-11`)** — `@api private`, calls
-  `assert_private()` (`install.pp:6`); managed only via `include 'tlog'`.
+- **`tlog::install` (`manifests/install.pp`)** — `@api private`, calls
+  `assert_private()` (`install.pp`); managed only via `include 'tlog'`.
   Declares `package { $tlog::package_name: ensure => $tlog::package_ensure }`
-  (`install.pp:8-10`).
+  (`install.pp`).
 
-- **`tlog::rec_session` (`manifests/rec_session.pp:48-123`)** — `@api public`.
+- **`tlog::rec_session` (`manifests/rec_session.pp`)** — `@api public`.
   This is **not** pulled in by the `tlog` class; a site includes it explicitly
-  to turn on session recording. It `include`s `tlog` (`rec_session.pp:58`).
-  Parameters (`rec_session.pp:49-55`):
+  to turn on session recording. It `include`s `tlog` (`rec_session.pp`).
+  Parameters (`rec_session.pp`):
   - `$options` (`Tlog::RecSessionConf`, **no default**) — required; the
     structured tlog-rec-session config (see the type below). Deep-merged
     through Hiera; default content comes from `data/common.yaml` and the
     `data/journald/` tree.
   - `$custom_options` (`Hash`, default `{}`) — **unvalidated** escape hatch,
     converted to JSON and merged with preference into `$options`
-    (`rec_session.pp:79`).
+    (`rec_session.pp`).
   - `$shell_hook` (`Boolean`, default `true`) — install the `/etc/profile.d`
     hooks that auto-record.
   - `$shell_hook_users` (`Array[String[1]]`, default `['root']`) — written to
@@ -72,43 +72,43 @@ Four classes, one custom data type, no defines.
 
   Resources:
   - `file { '/etc/tlog/tlog-rec-session.conf' }` — JSON of
-    `deep_merge($options, $custom_options)` (`rec_session.pp:77-81`).
+    `deep_merge($options, $custom_options)` (`rec_session.pp`).
   - If `$options['writer'] == 'file'`, `ensure_resource`s the output file at
     `$options['file']['path']` owned `tlog:tlog` mode `0640`
-    (`rec_session.pp:67-75`).
+    (`rec_session.pp`).
   - `file { '/etc/profile.d/00-simp-tlog.sh' }` and `{ '...00-simp-tlog.csh' }`
     — rendered from `templates/etc/profile.d/tlog.sh.epp` / `tlog.csh.epp` via
-    `epp()` with `users_file` + `app_path` (`rec_session.pp:88-108`). **The
+    `epp()` with `users_file` + `app_path` (`rec_session.pp`). **The
     template files are named `tlog.sh.epp` / `tlog.csh.epp`; the installed
     files are `00-simp-tlog.sh` / `.csh`** — the `00-` prefix makes them run
     first in `/etc/profile.d`.
-  - `file { $shell_hook_users_file }` — the users list (`rec_session.pp:110-114`).
+  - `file { $shell_hook_users_file }` — the users list (`rec_session.pp`).
   - When `$shell_hook` is false, the three hook files + users file are set to
     `ensure => 'absent'` via the `$_hook_file_ensure` selector
-    (`rec_session.pp:83-86`).
+    (`rec_session.pp`).
   - Ordering: `Class['tlog::install']` is applied before the conf file always,
-    and before the hook files only when `$shell_hook` (`rec_session.pp:116-122`).
+    and before the hook files only when `$shell_hook` (`rec_session.pp`).
 
-- **`tlog::config::rsyslog` (`manifests/config/rsyslog.pp:29-57`)** — routes
-  session records into local logging. Parameters (`rsyslog.pp:30-35`):
+- **`tlog::config::rsyslog` (`manifests/config/rsyslog.pp`)** — routes
+  session records into local logging. Parameters (`rsyslog.pp`):
   - `$logrotate_options` (`Hash`, **no default**) — supplied from
     `data/common.yaml`; merged into the logrotate rule.
   - `$match_rule` (`String[1]`) — rsyslog selector matching the
-    `tlog-rec-session` / `tlog` program names (`rsyslog.pp:31`).
+    `tlog-rec-session` / `tlog` program names (`rsyslog.pp`).
   - `$log_file` (`Stdlib::Absolutepath`, default `/var/log/tlog.log`).
   - `$logrotate_create` (`Pattern['\d{4} .+ .+']`, default `'0640 tlog tlog'`).
   - `$stop_processing` (`Boolean`, default `true`).
   - `$logrotate` (`Boolean`) — defaults to
     `simplib::lookup('simp_options::logrotate', { 'default_value' => false })`
-    (`rsyslog.pp:35`).
+    (`rsyslog.pp`).
 
-  It asserts `simp/rsyslog` (`rsyslog.pp:37`), `include`s `rsyslog`, declares
+  It asserts `simp/rsyslog` (`rsyslog.pp`), `include`s `rsyslog`, declares
   `rsyslog::rule::local { 'XX_tlog' }` (named `XX_` so it sorts before the
-  local-filesystem defaults, `rsyslog.pp:41-46`). When `$logrotate`, it
-  asserts `simp/logrotate` (`rsyslog.pp:49`), `include`s `logrotate`, and
-  declares `logrotate::rule { 'tlog' }` (`rsyslog.pp:48-56`).
+  local-filesystem defaults, `rsyslog.pp`). When `$logrotate`, it
+  asserts `simp/logrotate` (`rsyslog.pp`), `include`s `logrotate`, and
+  declares `logrotate::rule { 'tlog' }` (`rsyslog.pp`).
 
-- **`Tlog::RecSessionConf` (`types/recsessionconf.pp:2-29`)** — the struct type
+- **`Tlog::RecSessionConf` (`types/recsessionconf.pp`)** — the struct type
   validating `$tlog::rec_session::options`. All keys optional: `shell`,
   `notice`, `writer` (`Enum['journal','syslog','file']`), `latency`, `payload`,
   and nested structs `log` (input/output/window booleans), `limit`
@@ -123,9 +123,9 @@ through `simplib::lookup` with an explicit default:
 
 | Location | Key | `default_value` | Effect |
 |----------|-----|-----------------|--------|
-| `init.pp:16` | `simp_options::package_ensure` | `'installed'` | package ensure |
-| `init.pp:17` | `simp_options::syslog` | `false` | drives `$manage_rsyslog` → pulls in `tlog::config::rsyslog` |
-| `config/rsyslog.pp:35` | `simp_options::logrotate` | `false` | drives `$logrotate` → logrotate rule + `simp/logrotate` assertion |
+| `init.pp` | `simp_options::package_ensure` | `'installed'` | package ensure |
+| `init.pp` | `simp_options::syslog` | `false` | drives `$manage_rsyslog` → pulls in `tlog::config::rsyslog` |
+| `config/rsyslog.pp` | `simp_options::logrotate` | `false` | drives `$logrotate` → logrotate rule + `simp/logrotate` assertion |
 
 Keep routing SIMP toggles through `simplib::lookup('simp_options::*', {
 'default_value' => ... })` with an explicit default rather than assuming
@@ -136,32 +136,32 @@ Keep routing SIMP toggles through `simplib::lookup('simp_options::*', {
 - **The `tlog` class does not record anything by itself.** It only installs the
   package (and, if `simp_options::syslog`, configures rsyslog). Session
   recording requires explicitly including `tlog::rec_session`
-  (`init.pp:14-26`, `rec_session.pp:48`).
+  (`init.pp`, `rec_session.pp`).
 - **The shell hook silently re-execs matching users into `tlog-rec-session`.**
   The `/etc/profile.d/00-simp-tlog.sh` / `.csh` scripts check whether the
   current user (or a `%group`) is listed in `/etc/security/tlog.users` and, if
   so and a TTY is present, `exec` the shell under `tlog-rec-session`
   (`templates/etc/profile.d/tlog.sh.epp`). By default only `root` is recorded
-  (`rec_session.pp:52`). Keyboard **input capture is off by default** —
+  (`rec_session.pp`). Keyboard **input capture is off by default** —
   `data/common.yaml` sets `log.input: false` to avoid capturing typed secrets.
 - **Template vs. installed filename mismatch.** Templates are
   `tlog.sh.epp` / `tlog.csh.epp`; installed files are `00-simp-tlog.sh` /
-  `.csh` (`rec_session.pp:88,99`). Don't assume the on-disk profile.d name
+  `.csh` (`rec_session.pp`). Don't assume the on-disk profile.d name
   matches the template name.
 - **`$custom_options` is unvalidated.** Anything in it bypasses the
   `Tlog::RecSessionConf` type and is merged into the config JSON with
-  precedence (`rec_session.pp:23-25,79`). The tlog config file is not "real"
-  JSON, so Augeas/Ruby can't safely edit it ad hoc (`rec_session.pp:12-14`).
+  precedence (`rec_session.pp`). The tlog config file is not "real"
+  JSON, so Augeas/Ruby can't safely edit it ad hoc (`rec_session.pp`).
 - **The default `writer` is chosen by the `systemd` fact.** `data/journald/`
-  keys off `is_%{facts.systemd}` (`hiera.yaml:6-10`): systemd present →
+  keys off `is_%{facts.systemd}` (`hiera.yaml`): systemd present →
   `writer: journal` (`data/journald/is_true.yaml`); otherwise `writer: syslog`
   (`is_false.yaml` and the empty-fact `is_.yaml`).
 - **Optional dependencies are asserted only when the feature is on.**
   `simp/rsyslog` and `simp/logrotate` are declared as *optional* in
   `metadata.json` and guarded at runtime by
   `simplib::assert_optional_dependency` — `simp/rsyslog` at
-  `config/rsyslog.pp:37` (whenever rsyslog config runs) and `simp/logrotate` at
-  `config/rsyslog.pp:49` (only when `$logrotate` is true). If the feature is
+  `config/rsyslog.pp` (whenever rsyslog config runs) and `simp/logrotate` at
+  `config/rsyslog.pp` (only when `$logrotate` is true). If the feature is
   off, the module works without those modules installed.
 - **`tlog::rec_session` requires `$options`.** It has no default and is
   typed `Tlog::RecSessionConf`; the value comes from Hiera
@@ -183,9 +183,9 @@ required **only** when the corresponding feature is enabled, and asserted at
 runtime with `simplib::assert_optional_dependency`:
 
 - `simp/rsyslog` `>= 7.6.0 < 9.0.0` — needed when rsyslog config runs
-  (asserted `config/rsyslog.pp:37`).
+  (asserted `config/rsyslog.pp`).
 - `simp/logrotate` `>= 6.5.0 < 7.0.0` — needed when `$logrotate` is true
-  (asserted `config/rsyslog.pp:49`).
+  (asserted `config/rsyslog.pp`).
 
 Runtime requirement (from `metadata.json` `requirements`):
 `puppet >= 7.0.0 < 9.0.0`. This is the older SIMP baseline — the module is
@@ -229,10 +229,10 @@ The PR workflow runs **six jobs only**: `puppet-syntax`, `puppet-style`,
   **not wired into CI** — nothing runs `rake beaker:suites`. Acceptance must be
   run manually/locally.
 - This is an **older workflow style**: a global `env: PUPPET_VERSION: '~> 7'`
-  (`pr_tests.yml:29-30`) and Ruby pinned to 2.7.8 for the check jobs.
+  (`pr_tests.yml`) and Ruby pinned to 2.7.8 for the check jobs.
 - `spec-tests` runs a Puppet 7.x (Ruby 2.7) + Puppet 8.x (Ruby 3.2) matrix
-  (`pr_tests.yml:104-131`) and `needs: [puppet-syntax]`.
-- `ruby-style` is `continue-on-error: true` (`pr_tests.yml:61`).
+  (`pr_tests.yml`) and `needs: [puppet-syntax]`.
+- `ruby-style` is `continue-on-error: true` (`pr_tests.yml`).
 
 ## Common commands
 
@@ -261,11 +261,11 @@ puppet strings generate --format markdown --out REFERENCE.md
 bundle exec rake beaker:suites[default]
 ```
 
-Relevant gem pins (from `Gemfile`): `rubocop ~> 1.88.0` (`Gemfile:16`),
-`puppetlabs_spec_helper ~> 8.0.0` (`Gemfile:30`), `simp-rake-helpers
-~> 5.24.0` (`Gemfile:36`), `simp-beaker-helpers ~> 2.0.0` (`Gemfile:52`). The
-Puppet gem is pulled **only** via `gem 'puppet', puppet_version` (`Gemfile:29`),
-where `puppet_version` defaults to `['>= 7', '< 9']` (`Gemfile:23`). Unit specs
+Relevant gem pins (from `Gemfile`): `rubocop ~> 1.88.0` (`Gemfile`),
+`puppetlabs_spec_helper ~> 8.0.0` (`Gemfile`), `simp-rake-helpers
+~> 5.24.0` (`Gemfile`), `simp-beaker-helpers ~> 2.0.0` (`Gemfile`). The
+Puppet gem is pulled **only** via `gem 'puppet', puppet_version` (`Gemfile`),
+where `puppet_version` defaults to `['>= 7', '< 9']` (`Gemfile`). Unit specs
 require `spec/spec_helper.rb` (the standard puppetsync helper, `require` at
 line 11).
 
