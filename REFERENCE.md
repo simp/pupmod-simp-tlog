@@ -84,6 +84,8 @@ Options to pass to the `logrotate::rule` defined type
 
 @see `data/common.yaml`
 
+Default value: `{ 'missingok' => true, 'lastaction_restart_logger' => true }`
+
 ##### <a name="-tlog--config--rsyslog--match_rule"></a>`match_rule`
 
 Data type: `String[1]`
@@ -163,6 +165,8 @@ Configuration options for tlog-rec-session
 @see data/common.yaml
 @see types/recsession.pp
 
+Default value: `{ 'shell' => '/bin/bash', 'log' => { 'input' => false } }`
+
 ##### <a name="-tlog--rec_session--custom_options"></a>`custom_options`
 
 Data type: `Hash`
@@ -188,7 +192,7 @@ Data type: `Array[String[1]]`
 The list of users that you want to automatically record that will be stored
 in `$shell_hook_users_file`
 
-Default value: `[ 'root' ]`
+Default value: `['root']`
 
 ##### <a name="-tlog--rec_session--shell_hook_users_file"></a>`shell_hook_users_file`
 
