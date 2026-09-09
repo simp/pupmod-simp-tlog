@@ -13,12 +13,19 @@ describe 'tlog' do
 
   let(:hieradata) do
     {
-      # We'll be logging in directly in subsequent tests
-      'ssh::server::conf::permitrootlogin' => true,
-   'ssh::server::conf::passwordauthentication' => true,
-   'ssh::server::conf::authorizedkeysfile'     => '.ssh/authorized_keys',
-   'tlog::manage_rsyslog'                      => true,
-   'tlog::config::rsyslog::logrotate'          => true
+      # We'll be logging in directly in subsequent tests.
+      #
+      # Since simp/ssh 9.0.0 a bare `include ssh` no longer manages the sshd
+      # service, so the sshd_config entries below would be written but never
+      # picked up by the running daemon. Managing the service makes the config
+      # changes restart sshd, which the root password login tests depend on
+      # (EL9+ defaults to `PermitRootLogin prohibit-password`).
+      'ssh::server::service_ensure'               => 'running',
+      'ssh::server::conf::permitrootlogin'        => true,
+      'ssh::server::conf::passwordauthentication' => true,
+      'ssh::server::conf::authorizedkeysfile'     => '.ssh/authorized_keys',
+      'tlog::manage_rsyslog'                      => true,
+      'tlog::config::rsyslog::logrotate'          => true
     }
   end
 
