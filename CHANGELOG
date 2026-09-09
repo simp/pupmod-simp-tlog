@@ -1,3 +1,15 @@
+* Wed Sep 09 2026 Steven Pritchard <steve@sicura.us> - 1.0.2
+- Allow simp/rsyslog 10.x as an optional dependency. Its only breaking change
+  (removal of the archived tcpwrappers integration) does not affect this
+  module, and the old `< 10.0.0` bound made every catalog compile log an
+  `assert_optional_dependency()` error once rsyslog 10.0.0 was released.
+- Fix the acceptance tests for simp/ssh 9.0.0, which no longer manages the
+  `sshd` service on a bare `include ssh`. The suite now sets
+  `ssh::server::service_ensure: running` so the `PermitRootLogin` and
+  `PasswordAuthentication` settings it writes actually restart sshd; without
+  that the root password login tests failed on EL9+ (which defaults to
+  `PermitRootLogin prohibit-password`).
+
 * Mon Aug 24 2026 Steven Pritchard <steve@sicura.us> - 1.0.1
 - [puppetsync] Update metadata.json dependency ranges from the Forge
 
