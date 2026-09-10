@@ -1,5 +1,6 @@
 * Thu Sep 10 2026 Chris Tessmer <chris.tessmer@onyxpoint.com> - 1.0.3
 - Use `stdlib::to_json` instead of deprecated (stdlib) `to_json`
+- Bump stdlib dep to >= 9 (patch-level fix: no API or behavior change)
 
 * Wed Sep 09 2026 Steven Pritchard <steve@sicura.us> - 1.0.2
 - Allow simp/rsyslog 10.x as an optional dependency. Its only breaking change
