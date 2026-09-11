@@ -76,7 +76,7 @@ class tlog::rec_session (
 
   file { '/etc/tlog/tlog-rec-session.conf':
     ensure  => 'file',
-    content => sprintf("%s\n", to_json(deep_merge($options, $custom_options))),
+    content => sprintf("%s\n", stdlib::to_json(deep_merge($options, $custom_options))),
     *       => $_file_defaults
   }
 
