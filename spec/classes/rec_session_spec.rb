@@ -57,7 +57,7 @@ describe 'tlog::rec_session' do
         if os_facts[:systemd]
           let(:conf_content) do
             {
-              'shell'  => '/bin/bash',
+              'shell' => '/bin/bash',
            'writer' => 'journal',
            'log'    => {
              'input' => false
@@ -67,7 +67,7 @@ describe 'tlog::rec_session' do
         else
           let(:conf_content) do
             {
-              'shell'  => '/bin/bash',
+              'shell' => '/bin/bash',
            'writer' => 'syslog',
            'log'    => {
              'input' => false
