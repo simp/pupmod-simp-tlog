@@ -1,3 +1,12 @@
+* Tue Oct 06 2026 Hazel Caballero <hazel@sicura.us> - 1.0.4
+- Create the `file` writer's log file (owned by `tlog:tlog`, mode `0640`) when
+  `writer: file` is set in `custom_options`, not only in `options`. An
+  existing log file at that path is changed to that owner and mode, which
+  `tlog-rec-session` needs to write it.
+- Fail with a clear message when the `file` writer has no absolute `path`
+- Install the package before managing the `file` writer's log file, which is
+  owned by the package's `tlog` user
+
 * Thu Sep 10 2026 Chris Tessmer <chris.tessmer@onyxpoint.com> - 1.0.3
 - Use `stdlib::to_json` instead of deprecated (stdlib) `to_json`
 - Bump stdlib dep to >= 9 (patch-level fix: no API or behavior change)

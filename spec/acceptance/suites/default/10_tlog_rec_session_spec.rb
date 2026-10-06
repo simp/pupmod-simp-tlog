@@ -80,6 +80,41 @@ end
       require_relative('include/remote_user_login_tests')
 
       include_context 'remote user logins', host
+
+      context 'with the file writer' do
+        let(:log_file) { '/var/log/tlog-file-writer.log' }
+        let(:test_user) { 'tlog_file_user' }
+
+        let(:file_writer_hieradata) do
+          {
+            'tlog::rec_session::options' => {
+              'writer' => 'file',
+              'file'   => { 'path' => log_file }
+            },
+            'tlog::rec_session::shell_hook_users' => []
+          }
+        end
+
+        it 'works with no errors' do
+          set_hieradata_on(host, file_writer_hieradata)
+          apply_manifest_on(host, manifest, catch_failures: true)
+        end
+
+        it 'is idempotent' do
+          apply_manifest_on(host, manifest, catch_changes: true)
+        end
+
+        it 'creates the log file writable by tlog' do
+          expect(on(host, %(stat -c '%U:%G %a' #{log_file})).stdout.strip).to eq('tlog:tlog 640')
+        end
+
+        it 'records a non-root session to the log file' do
+          on(host, %(puppet resource user #{test_user} ensure=present managehome=true))
+          on(host, %(su - #{test_user} -c "tlog-rec-session -c 'echo tlog_file_marker'"))
+
+          expect(file_contents_on(host, log_file)).to include('tlog_file_marker')
+        end
+      end
     end
   end
 end
