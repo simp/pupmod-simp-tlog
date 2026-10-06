@@ -10,7 +10,7 @@
 
 * [`tlog`](#tlog): This module manages the configuration of [TLog](https://github.com/Scribery/tlog)
 * [`tlog::config::rsyslog`](#tlog--config--rsyslog): Manage local syslog hooks for tlog
-* [`tlog::rec_session`](#tlog--rec_session): Configure `tlog-rec-session`  This is pulled out from the main `tlog` class because of the rapidly moving nature of the project. Having this 
+* [`tlog::rec_session`](#tlog--rec_session): Configure `tlog-rec-session`  This is pulled out from the main `tlog` class because of the rapidly moving nature of the project. Having this
 
 #### Private Classes
 
@@ -255,4 +255,3 @@ Struct[{
   }]
 }]
 ```
-
