@@ -163,7 +163,8 @@ Configuration options for tlog-rec-session
   platform will be selected.
 * When the merged `writer` is `file`, the `file` `path` must be set, and
   that file is created owned by `tlog:tlog` with mode `0640`, because
-  `tlog-rec-session` runs as `tlog` and cannot create it.
+  `tlog-rec-session` runs as `tlog` and cannot create it. A missing parent
+  directory is created (owned by `root`); an existing one is not changed.
 
 @see data/common.yaml
 @see types/recsession.pp

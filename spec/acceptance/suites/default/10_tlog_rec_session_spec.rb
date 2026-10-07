@@ -82,7 +82,7 @@ end
       include_context 'remote user logins', host
 
       context 'with the file writer' do
-        let(:log_file) { '/var/log/tlog-file-writer.log' }
+        let(:log_file) { '/var/log/tlog-file-writer/session.log' }
         let(:test_user) { 'tlog_file_user' }
 
         let(:file_writer_hieradata) do
@@ -102,6 +102,10 @@ end
 
         it 'is idempotent' do
           apply_manifest_on(host, manifest, catch_changes: true)
+        end
+
+        it 'creates the missing log directory' do
+          expect(on(host, %(stat -c '%U:%G' #{File.dirname(log_file)})).stdout.strip).to eq('root:root')
         end
 
         it 'creates the log file writable by tlog' do

@@ -18,7 +18,8 @@
 #     platform will be selected.
 #   * When the merged `writer` is `file`, the `file` `path` must be set, and
 #     that file is created owned by `tlog:tlog` with mode `0640`, because
-#     `tlog-rec-session` runs as `tlog` and cannot create it.
+#     `tlog-rec-session` runs as `tlog` and cannot create it. A missing parent
+#     directory is created (owned by `root`); an existing one is not changed.
 #
 #   @see data/common.yaml
 #   @see types/recsession.pp
@@ -83,6 +84,21 @@ class tlog::rec_session (
       group  => 'tlog',
       mode   => '0640',
     }
+    # Create a missing parent directory without declaring it as a `File`, which
+    # could duplicate a declaration elsewhere (e.g. `/var/log`). An existing
+    # directory is left as it is.
+    #
+    # TODO: reevaluate this during the blast-radius refactor, e.g. an opt-in
+    # parameter that manages the directory (owner, mode) explicitly.
+    $_log_dir = dirname($_log_file)
+
+    exec { "tlog::rec_session create ${_log_dir}":
+      command => "mkdir -p ${stdlib::shell_escape($_log_dir)}",
+      path    => ['/usr/bin', '/bin'],
+      creates => $_log_dir,
+      before  => File[$_log_file],
+    }
+
     ensure_resource('file', $_log_file, $_tlog_output_file_opts)
 
     # The `tlog` user is created by the package

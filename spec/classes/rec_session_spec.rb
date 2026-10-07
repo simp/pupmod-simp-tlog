@@ -111,6 +111,15 @@ describe 'tlog::rec_session' do
           }
 
           it { is_expected.to create_class('tlog::install').that_comes_before('File[/var/log/tlog.log]') }
+
+          it {
+            is_expected.to create_exec('tlog::rec_session create /var/log')
+              .with_command('mkdir -p /var/log')
+              .with_creates('/var/log')
+              .that_comes_before('File[/var/log/tlog.log]')
+          }
+
+          it { is_expected.not_to contain_file('/var/log') }
         end
 
         context 'with a file writer set in custom_options' do
@@ -138,6 +147,29 @@ describe 'tlog::rec_session' do
           }
 
           it { is_expected.to create_class('tlog::install').that_comes_before('File[/var/log/tlog/session.log]') }
+
+          it {
+            is_expected.to create_exec('tlog::rec_session create /var/log/tlog')
+              .with_command('mkdir -p /var/log/tlog')
+              .with_creates('/var/log/tlog')
+              .that_comes_before('File[/var/log/tlog/session.log]')
+          }
+        end
+
+        context 'with a file writer whose directory is declared elsewhere' do
+          let(:post_condition) { "file { '/var/log': ensure => 'directory', mode => '0755' }" }
+          let(:params) do
+            {
+              options: {
+                'writer' => 'file',
+                'file'   => {
+                  'path' => '/var/log/tlog.log'
+                }
+              }
+            }
+          end
+
+          it { is_expected.to compile.with_all_deps }
         end
 
         context 'with a file writer and no path' do

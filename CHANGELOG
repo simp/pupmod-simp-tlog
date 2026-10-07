@@ -3,6 +3,8 @@
   `writer: file` is set in `custom_options`, not only in `options`. An
   existing log file at that path is changed to that owner and mode, which
   `tlog-rec-session` needs to write it.
+- Create a missing parent directory for the `file` writer's log file. An
+  existing directory is not changed.
 - Fail with a clear message when the `file` writer has no absolute `path`
 - Install the package before managing the `file` writer's log file, which is
   owned by the package's `tlog` user
