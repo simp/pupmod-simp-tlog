@@ -16,6 +16,10 @@
 #     for arbitrary settings.
 #   * Note: If the `writer` option is not set, a sane default for the target
 #     platform will be selected.
+#   * When the merged `writer` is `file`, the `file` `path` must be set, and
+#     that file is created owned by `tlog:tlog` with mode `0640`, because
+#     `tlog-rec-session` runs as `tlog` and cannot create it. A missing parent
+#     directory is created (owned by `root`); an existing one is not changed.
 #
 #   @see data/common.yaml
 #   @see types/recsession.pp
@@ -63,20 +67,48 @@ class tlog::rec_session (
     mode    => '0644'
   }
 
-  # Ensure the file resource exists if we are using a file writer
-  if $options['writer'] == 'file' {
+  $_conf = deep_merge($options, $custom_options)
+
+  # tlog-rec-session runs setuid `tlog` and cannot create its log file, so the
+  # file writer needs the file to exist and be writable by `tlog`
+  if $_conf['writer'] == 'file' {
+    $_log_file = $_conf.dig('file', 'path')
+
+    unless $_log_file =~ Stdlib::Absolutepath {
+      fail("tlog::rec_session: the 'file' writer requires an absolute 'file' => { 'path' => ... } in \$options or \$custom_options")
+    }
+
     $_tlog_output_file_opts = {
       ensure => 'file',
       owner  => 'tlog',
       group  => 'tlog',
       mode   => '0640',
     }
-    ensure_resource('file', $options['file']['path'], $_tlog_output_file_opts)
+    # Create a missing parent directory without declaring it as a `File`, which
+    # could duplicate a declaration elsewhere (e.g. `/var/log`). An existing
+    # directory is left as it is.
+    #
+    # TODO: reevaluate this during the blast-radius refactor, e.g. an opt-in
+    # parameter that manages the directory (owner, mode) explicitly.
+    $_log_dir = dirname($_log_file)
+
+    exec { "tlog::rec_session create ${_log_dir}":
+      command => "mkdir -p ${stdlib::shell_escape($_log_dir)}",
+      path    => ['/usr/bin', '/bin'],
+      umask   => '0022',
+      creates => $_log_dir,
+      before  => File[$_log_file],
+    }
+
+    ensure_resource('file', $_log_file, $_tlog_output_file_opts)
+
+    # The `tlog` user is created by the package
+    Class['tlog::install'] -> File[$_log_file]
   }
 
   file { '/etc/tlog/tlog-rec-session.conf':
     ensure  => 'file',
-    content => sprintf("%s\n", stdlib::to_json(deep_merge($options, $custom_options))),
+    content => sprintf("%s\n", stdlib::to_json($_conf)),
     *       => $_file_defaults
   }
 

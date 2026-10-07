@@ -10,7 +10,7 @@
 
 * [`tlog`](#tlog): This module manages the configuration of [TLog](https://github.com/Scribery/tlog)
 * [`tlog::config::rsyslog`](#tlog--config--rsyslog): Manage local syslog hooks for tlog
-* [`tlog::rec_session`](#tlog--rec_session): Configure `tlog-rec-session`  This is pulled out from the main `tlog` class because of the rapidly moving nature of the project. Having this 
+* [`tlog::rec_session`](#tlog--rec_session): Configure `tlog-rec-session`  This is pulled out from the main `tlog` class because of the rapidly moving nature of the project. Having this
 
 #### Private Classes
 
@@ -161,6 +161,10 @@ Configuration options for tlog-rec-session
   for arbitrary settings.
 * Note: If the `writer` option is not set, a sane default for the target
   platform will be selected.
+* When the merged `writer` is `file`, the `file` `path` must be set, and
+  that file is created owned by `tlog:tlog` with mode `0640`, because
+  `tlog-rec-session` runs as `tlog` and cannot create it. A missing parent
+  directory is created (owned by `root`); an existing one is not changed.
 
 @see data/common.yaml
 @see types/recsession.pp
@@ -252,4 +256,3 @@ Struct[{
   }]
 }]
 ```
-
