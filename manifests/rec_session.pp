@@ -95,6 +95,7 @@ class tlog::rec_session (
     exec { "tlog::rec_session create ${_log_dir}":
       command => "mkdir -p ${stdlib::shell_escape($_log_dir)}",
       path    => ['/usr/bin', '/bin'],
+      umask   => '0022',
       creates => $_log_dir,
       before  => File[$_log_file],
     }
