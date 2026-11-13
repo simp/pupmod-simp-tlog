@@ -172,19 +172,19 @@ Keep routing SIMP toggles through `simplib::lookup('simp_options::*', {
 
 Module dependencies (from `metadata.json`):
 
-- `simp/simplib` `>= 4.9.0 < 5.0.0` (provides `simplib::lookup`,
+- `simp/simplib` `>= 4.9.0 < 8.0.0` (provides `simplib::lookup`,
   `simplib::assert_metadata`, `simplib::assert_optional_dependency`, and the
   `Simplib::Syslog::*` types used by `Tlog::RecSessionConf`).
-- `puppetlabs/stdlib` `>= 8.0.0 < 10.0.0` (provides `deep_merge`, `to_json`,
+- `puppetlabs/stdlib` `>= 9.0.0 < 11.0.0` (provides `deep_merge`, `to_json`,
   `ensure_resource`, `Stdlib::Absolutepath`).
 
 Optional dependencies (from `metadata.json` `simp.optional_dependencies`) —
 required **only** when the corresponding feature is enabled, and asserted at
 runtime with `simplib::assert_optional_dependency`:
 
-- `simp/rsyslog` `>= 7.6.0 < 9.0.0` — needed when rsyslog config runs
+- `simp/rsyslog` `>= 7.6.0 < 12.0.0` — needed when rsyslog config runs
   (asserted `manifests/config/rsyslog.pp`).
-- `simp/logrotate` `>= 6.5.0 < 7.0.0` — needed when `$logrotate` is true
+- `simp/logrotate` `>= 6.5.0 < 8.0.0` — needed when `$logrotate` is true
   (asserted `manifests/config/rsyslog.pp`).
 
 Runtime requirement (from `metadata.json` `requirements`):
